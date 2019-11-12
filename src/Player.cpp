@@ -1,0 +1,130 @@
+#include "Player.h"
+#include <KinematicCollision.hpp>
+#include <SceneTree.hpp>
+#include <ResourceLoader.hpp>
+#include <PackedScene.hpp>
+
+using namespace godot;
+
+void Player::_register_methods() {
+	register_method("_process", &Player::_process);
+	register_method("_physics_process", &Player::_physics_process);
+	register_method("_ready", &Player::_ready);
+}
+
+Player::Player() {
+}
+
+Player::~Player() {
+	// add your cleanup here
+}
+
+
+void Player::_init() {
+	input = Input::get_singleton();
+	moveSpeed = 10;
+	jumpForce = 100;
+	velocity = Vector3(0,0,0);
+	gravity = Vector3(0,-5,0);
+    terminal_velocity = Vector3(moveSpeed,jumpForce,moveSpeed);
+}
+
+void Player::_ready(){
+}
+
+void Player::_process(float delta) {
+
+}
+
+void Player::_physics_process(float delta) {
+    me = Object::cast_to<KinematicBody>(get_node("KinematicBody"));
+    FrontDirection front_direction = FrontDirection::None;
+    if (input->is_key_pressed(87)) {
+        front_direction = FrontDirection::Forward;
+    }
+    if (input->is_key_pressed(83)) {
+        front_direction = FrontDirection::Backward;
+    }
+    SideDirection side_direction = SideDirection::None;
+    if (input->is_key_pressed(65)) {
+        side_direction = SideDirection::Left;
+    }
+    if (input->is_key_pressed(68)) {
+        side_direction = SideDirection::Right;
+    }
+
+    MovementAction move_action = MovementAction::None;
+    if (input->is_key_pressed(32)) {
+        move_action = MovementAction::Jump;
+    }
+
+    _move(front_direction, side_direction, move_action);
+	
+	
+}
+
+void Player::_move(Player::FrontDirection front_direction, Player::SideDirection side_direction, Player::MovementAction move_action) {
+    // Compute force vector based on current state
+
+    Vector3 forceVector = Vector3(0,0,0);
+    Vector3 curr_gravity = gravity;
+
+    handle_movement(forceVector, front_direction,side_direction);
+    handle_move_action(forceVector, move_action);
+    handle_gravity(forceVector, curr_gravity);
+
+    //velocity += forceVector.rotated(Vector3(0,1,0),current_rotation);
+    velocity += forceVector;
+    if (velocity.x > terminal_velocity.x) { velocity.x = terminal_velocity.x;}
+    if (velocity.y > terminal_velocity.y) { velocity.y = terminal_velocity.y;}
+    if (velocity.z > terminal_velocity.z) { velocity.z = terminal_velocity.z;}
+
+    if (velocity.x < -1 * terminal_velocity.x) { velocity.x = -1 * terminal_velocity.x;}
+    if (velocity.y < -1 * terminal_velocity.y) { velocity.y = -1 * terminal_velocity.y;}
+    if (velocity.z < -1 * terminal_velocity.z) { velocity.z = -1 * terminal_velocity.z;}
+
+    // Ref<KinematicCollision> coll = me->move_and_collide(velocity);
+    // KinematicCollision* collision = *coll;
+    // Godot::print(collision->get_normal());
+
+    velocity = me->move_and_slide(velocity, Vector3(0,1,0));
+    
+    velocity = velocity.linear_interpolate(Vector3(0,0,0),.1);
+}
+
+void Player::handle_movement(Vector3& force, Player::FrontDirection front_direction, Player::SideDirection side_direction) {
+	switch (front_direction)
+    {
+    case FrontDirection::Forward:
+        force.z -= moveSpeed;
+        break;
+    case FrontDirection::Backward:
+        force.z += moveSpeed;
+        break;
+    default:
+        break;
+    }
+
+    switch (side_direction)
+    {
+    case SideDirection::Left:
+        force.x -= moveSpeed;
+        break;
+    case SideDirection::Right:
+        force.x += moveSpeed;
+        break;
+    default:
+        break;
+    }
+}
+
+void Player::handle_move_action(Vector3& force, Player::MovementAction move_action) {
+    if(me->is_on_floor() && move_action == MovementAction::Jump) {
+		force.y += jumpForce;
+	}
+}
+
+void Player::handle_gravity(Vector3& force, Vector3& curr_gravity) {
+    force += curr_gravity;
+}
+
