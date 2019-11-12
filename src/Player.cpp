@@ -3,13 +3,16 @@
 #include <SceneTree.hpp>
 #include <ResourceLoader.hpp>
 #include <PackedScene.hpp>
+#include <InputEventMouseMotion.hpp>
 
 using namespace godot;
+#define PI 3.14
 
 void Player::_register_methods() {
 	register_method("_process", &Player::_process);
 	register_method("_physics_process", &Player::_physics_process);
 	register_method("_ready", &Player::_ready);
+    register_method("_input", &Player::_input);
 }
 
 Player::Player() {
@@ -30,14 +33,34 @@ void Player::_init() {
 }
 
 void Player::_ready(){
+    input->set_mouse_mode(Input::MOUSE_MODE_HIDDEN);
 }
 
 void Player::_process(float delta) {
 
 }
 
+void Player::_input(InputEvent* event) {
+    InputEventMouseMotion *m = cast_to<InputEventMouseMotion>(event);
+    if (m != nullptr) {
+        float mouse_rotation = -m->get_relative().x * mouse_x_sensitivity * PI/180.0;
+        if (me != nullptr) {
+            me->rotate_y(mouse_rotation);
+            rotation += mouse_rotation;
+        }
+
+        float pan = -m->get_relative().y * mouse_y_sensitivity;
+        if (camera_angle + pan < 90 && camera_angle + pan > -90 && camera != nullptr) {
+            Godot::print("Rotate Camera!");
+            camera->rotate_x(pan * PI/180.0);
+            camera_angle += pan;
+        }
+    }
+}
+
 void Player::_physics_process(float delta) {
     me = Object::cast_to<KinematicBody>(get_node("KinematicBody"));
+    camera = Object::cast_to<Camera>(get_node("KinematicBody/Camera"));
     FrontDirection front_direction = FrontDirection::None;
     if (input->is_key_pressed(87)) {
         front_direction = FrontDirection::Forward;
@@ -74,7 +97,8 @@ void Player::_move(Player::FrontDirection front_direction, Player::SideDirection
     handle_gravity(forceVector, curr_gravity);
 
     //velocity += forceVector.rotated(Vector3(0,1,0),current_rotation);
-    velocity += forceVector;
+    velocity += forceVector.rotated(Vector3(0,1,0),rotation);
+    // velocity += forceVector;
     if (velocity.x > terminal_velocity.x) { velocity.x = terminal_velocity.x;}
     if (velocity.y > terminal_velocity.y) { velocity.y = terminal_velocity.y;}
     if (velocity.z > terminal_velocity.z) { velocity.z = terminal_velocity.z;}
@@ -83,13 +107,9 @@ void Player::_move(Player::FrontDirection front_direction, Player::SideDirection
     if (velocity.y < -1 * terminal_velocity.y) { velocity.y = -1 * terminal_velocity.y;}
     if (velocity.z < -1 * terminal_velocity.z) { velocity.z = -1 * terminal_velocity.z;}
 
-    // Ref<KinematicCollision> coll = me->move_and_collide(velocity);
-    // KinematicCollision* collision = *coll;
-    // Godot::print(collision->get_normal());
-
     velocity = me->move_and_slide(velocity, Vector3(0,1,0));
     
-    velocity = velocity.linear_interpolate(Vector3(0,0,0),.1);
+    velocity = velocity.linear_interpolate(Vector3(0,0,0),.2);
 }
 
 void Player::handle_movement(Vector3& force, Player::FrontDirection front_direction, Player::SideDirection side_direction) {

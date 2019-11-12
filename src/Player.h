@@ -10,6 +10,7 @@
 #include <Input.hpp>
 #include <InputEvent.hpp>
 #include <KinematicBody.hpp>
+#include <Camera.hpp>
 
 namespace godot {
 
@@ -21,6 +22,14 @@ namespace godot {
 		Input* input;
 		
 		Vector3 velocity;
+
+		float camera_angle = 0;
+		float mouse_x_sensitivity = 0.3;
+		float mouse_y_sensitivity = 0.3;
+		float rotation = 0;
+
+		float max_walk_angle = 0.75;
+
 
 	public:
 
@@ -37,6 +46,7 @@ namespace godot {
         };
 
 		KinematicBody* me;
+		Camera* camera;
 
 		float moveSpeed;
 		float jumpForce;
@@ -53,6 +63,7 @@ namespace godot {
 
 		void _process(float delta);
 		void _physics_process(float delta);
+		void _input(InputEvent *event);
         void _move(FrontDirection front_direction, SideDirection side_direction, MovementAction action);
 		void _ready();
 
