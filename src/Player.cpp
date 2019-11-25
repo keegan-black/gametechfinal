@@ -222,7 +222,7 @@ void Player::_shoot() {
         Object* obj = ray->get_collider();
         StaticBody* body = Object::cast_to<StaticBody>(obj);
         if (body != nullptr) {
-            Structure* structure = Node::cast_to<Structure>(body->get_parent());
+            Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
                 Godot::print("Wall Hit");
                 structure->_take_damage(20);
@@ -300,9 +300,9 @@ void Player::handle_gravity(Vector3& force, Vector3& curr_gravity) {
 
 Vector3 Player::_to_grid_coordinate(Vector3 location) {
     Vector3 ret = Vector3(0,0,0);
-    ret.x = ((int) location.x / GRID_SIZE) * GRID_SIZE;
-    ret.y = ((int) location.y / GRID_SIZE) * GRID_SIZE;
-    ret.z = ((int) location.z / GRID_SIZE) * GRID_SIZE;
+    ret.x = ((int) location.x / GRID_SIZE) * GRID_SIZE + (location.x/abs(location.x) * GRID_SIZE/2);
+    ret.y = ((int) location.y / GRID_SIZE) * GRID_SIZE + (location.y/abs(location.y) * GRID_SIZE/2);
+    ret.z = ((int) location.z / GRID_SIZE) * GRID_SIZE + (location.z/abs(location.z) * GRID_SIZE/2);
     return ret;
 }
 
