@@ -47,7 +47,7 @@ namespace godot {
         };
 
 		enum class Action {
-			None, Shoot
+			None, Shoot, Build_Wall, Build_Ramp
 		};
 
 		KinematicBody* me;
@@ -61,6 +61,7 @@ namespace godot {
 		Vector3 terminal_velocity = Vector3(10,10,10);
 
 		bool is_shooting = false;
+		bool is_building = false;
 
 		static void _register_methods();
 
@@ -78,7 +79,11 @@ namespace godot {
 
 	private:
 
+		float _get_grid_rotation();
 		void _shoot();
+		void _build(Action action);
+		void _create_wall_at(Vector3 floor_location);
+		void _create_ramp_at(Vector3 floor_location);
 		void handle_gravity(Vector3& force, Vector3& gravity);
 		void handle_movement(Vector3& force, FrontDirection front_direction, SideDirection side_direction);
 		void handle_move_action(Vector3& force, MovementAction move_action);

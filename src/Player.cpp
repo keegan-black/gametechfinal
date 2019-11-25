@@ -9,6 +9,7 @@
 
 using namespace godot;
 #define PI 3.14
+#define GRID_SIZE 3
 
 void Player::_register_methods() {
 	register_method("_process", &Player::_process);
@@ -92,6 +93,19 @@ void Player::_physics_process(float delta) {
     } else {
         is_shooting = false;
     }
+    if (input->is_key_pressed(82)) {
+        if (!is_building) {
+            is_building = true;
+            action = Action::Build_Wall;
+        }  
+    } else if(input->is_key_pressed(84)) {
+        if (!is_building) {
+            is_building = true;
+            action = Action::Build_Ramp;
+        }  
+    } else {
+        is_building = false;
+    }
 
     _perform_action(action);
     _move(front_direction, side_direction, move_action);
@@ -103,10 +117,96 @@ void Player::_perform_action(Player::Action action) {
     if (action == Action::Shoot) {
         _shoot();
     }
+    if (action == Action::Build_Wall || action == Action::Build_Ramp) {
+        _build(action);
+    }
+}
+
+float Player::_get_grid_rotation() {
+    float rot_degrees = rotation * 180/PI;
+    int current_rotation = ((int) rot_degrees) % 360;
+    if (current_rotation < 0) {
+        current_rotation += 360;
+    }
+
+    Godot::print(std::to_string(current_rotation).c_str());
+
+    if (current_rotation >= 0 && current_rotation < 45) {
+        return 0;
+    } else if (current_rotation >= 45 && current_rotation < 135) {
+        return 90 * PI/180;
+    } else if (current_rotation >= 135 && current_rotation < 225) {
+        return 180 * PI/180;
+    } else if (current_rotation >= 225 && current_rotation < 315) {
+        return 270 * PI/180;
+    }
+    return 0;
+}
+
+void Player::_build(Player::Action action) {
+    Godot::print("Build Wall");
+
+    if (ray == nullptr) {
+        Godot::print("Ray not found");
+        return;
+    }
+
+    ray->set_collide_with_areas(false);
+    ray->set_collide_with_bodies(true);
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(0,0,-5));
+    ray->force_raycast_update();
+
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        if (body != nullptr) {
+            if (body->get_name() == "FloorStaticBody") {
+                Godot::print("Found Floor");
+                if (action == Action::Build_Wall) {
+                    _create_wall_at(ray->get_collision_point());
+                } else if(action == Action::Build_Ramp) {
+                    _create_ramp_at(ray->get_collision_point());
+                }
+
+            }
+        } 
+    }
+
+    ray->set_enabled(false);
+}
+
+void Player::_create_ramp_at(Vector3 floor_location) {
+    Vector3 new_location = Vector3((int) floor_location.x, (int) floor_location.y + 2, (int) floor_location.z);
+    Godot::print(new_location);
+    ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
+    Ref<PackedScene> RampScene = resourceLoader->load("res://Ramp.tscn");
+    godot::Structure* ramp = static_cast<godot::Structure*>(RampScene->instance());
+
+    get_node("/root/Spatial")->add_child(ramp);
+    float rot = _get_grid_rotation();
+    ramp->rotate(Vector3(0,1,0),rot);
+    ramp->set_global_transform(Transform(ramp->get_global_transform().basis,new_location));
+}
+
+void Player::_create_wall_at(Vector3 floor_location) {
+    Vector3 new_location = Vector3((int) floor_location.x, (int) floor_location.y + 2, (int) floor_location.z);
+    Godot::print(new_location);
+    ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
+    Ref<PackedScene> WallScene = resourceLoader->load("res://Wall.tscn");
+    godot::Structure* wall = static_cast<godot::Structure*>(WallScene->instance());
+
+    get_node("/root/Spatial")->add_child(wall);
+    float rot = _get_grid_rotation();
+    wall->rotate(Vector3(0,1,0),rot);
+    wall->set_global_transform(Transform(wall->get_global_transform().basis,new_location));
+
 }
 
 void Player::_shoot() {
-    Godot::print("Shooting!");
+    Godot::print("Shoot");
     if (ray == nullptr) {
         Godot::print("Ray not found");
         return;
