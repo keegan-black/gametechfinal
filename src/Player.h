@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include <Godot.hpp>
+#include "GridBlock.h"
 #include <Area.hpp>
 #include <RandomNumberGenerator.hpp>
 #include <CollisionShape.hpp>
@@ -47,7 +48,7 @@ namespace godot {
         };
 
 		enum class Action {
-			None, Shoot, Build_Wall, Build_Ramp
+			None, Shoot, Build_Wall, Build_Ramp, Build_Floor
 		};
 
 		KinematicBody* me;
@@ -82,8 +83,8 @@ namespace godot {
 		float _get_grid_rotation();
 		void _shoot();
 		void _build(Action action);
-		void _create_wall_at(Vector3 floor_location);
-		void _create_ramp_at(Vector3 floor_location);
+		void _create_grid_block_at(Vector3 floor_location, Action action);
+		void _build_in_grid_block(GridBlock* gridBlock, Action action);
 		void handle_gravity(Vector3& force, Vector3& gravity);
 		void handle_movement(Vector3& force, FrontDirection front_direction, SideDirection side_direction);
 		void handle_move_action(Vector3& force, MovementAction move_action);

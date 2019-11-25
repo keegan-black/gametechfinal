@@ -1,6 +1,7 @@
 #include <Godot.hpp>
 #include "Player.h"
 #include "Structure.h"
+#include "GridBlock.h"
 
 extern "C" void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *o) {
     godot::Godot::gdnative_init(o);
@@ -15,5 +16,6 @@ extern "C" void GDN_EXPORT godot_nativescript_init(void *handle) {
 
    godot::register_class<godot::Player>();
    godot::register_class<godot::Structure>();
+   godot::register_class<godot::GridBlock>();
     
 }

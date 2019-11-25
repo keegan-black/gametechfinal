@@ -132,24 +132,24 @@ float Player::_get_grid_rotation() {
     if (current_rotation >= 0 && current_rotation < 45) {
         return 0;
     } else if (current_rotation >= 45 && current_rotation < 135) {
-        return 90 * PI/180;
+        return 90;
     } else if (current_rotation >= 135 && current_rotation < 225) {
-        return 180 * PI/180;
+        return 180;
     } else if (current_rotation >= 225 && current_rotation < 315) {
-        return 270 * PI/180;
+        return 270;
     }
     return 0;
 }
 
 void Player::_build(Player::Action action) {
-    Godot::print("Build Wall");
+    Godot::print("Build");
 
     if (ray == nullptr) {
         Godot::print("Ray not found");
         return;
     }
 
-    ray->set_collide_with_areas(false);
+    ray->set_collide_with_areas(true);
     ray->set_collide_with_bodies(true);
 
     ray->set_enabled(true);
@@ -163,12 +163,14 @@ void Player::_build(Player::Action action) {
         if (body != nullptr) {
             if (body->get_name() == "FloorStaticBody") {
                 Godot::print("Found Floor");
-                if (action == Action::Build_Wall) {
-                    _create_wall_at(ray->get_collision_point());
-                } else if(action == Action::Build_Ramp) {
-                    _create_ramp_at(ray->get_collision_point());
-                }
+                _create_grid_block_at(ray->get_collision_point(), action);
 
+            } else {
+                Godot::print("Found GridBlock");
+                GridBlock* gridBlock = Node::cast_to<GridBlock>(body->get_parent()->get_parent());
+                if (gridBlock != nullptr) {
+                    _build_in_grid_block(gridBlock, action);
+                }
             }
         } 
     }
@@ -176,35 +178,50 @@ void Player::_build(Player::Action action) {
     ray->set_enabled(false);
 }
 
-void Player::_create_ramp_at(Vector3 floor_location) {
-    Vector3 new_location = _to_grid_coordinate(floor_location + Vector3(0,1,0));
+void Player::_create_grid_block_at(Vector3 floor_location, Action action) {
+    Vector3 new_location = _to_grid_coordinate(floor_location);
     Godot::print(new_location);
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
-    Ref<PackedScene> RampScene = resourceLoader->load("res://Ramp.tscn");
-    godot::Structure* ramp = static_cast<godot::Structure*>(RampScene->instance());
+    Ref<PackedScene> gridScene = resourceLoader->load("res://GridBlock.tscn");
+    godot::GridBlock* gridBlock = static_cast<godot::GridBlock*>(gridScene->instance());
+    gridBlock->_clear_structure_pointers();
 
-    get_node("/root/Spatial")->add_child(ramp);
-    float rot = _get_grid_rotation();
-    ramp->rotate(Vector3(0,1,0),rot);
-    ramp->set_global_transform(Transform(ramp->get_global_transform().basis,new_location));
+    get_node("/root/Spatial")->add_child(gridBlock);
+    gridBlock->set_global_transform(Transform(gridBlock->get_global_transform().basis,new_location));
+
+    _build_in_grid_block(gridBlock, action);
 }
 
-void Player::_create_wall_at(Vector3 floor_location) {
-    Vector3 new_location = _to_grid_coordinate(floor_location + Vector3(0,1,0));
-    Godot::print(new_location);
-    ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
-    Ref<PackedScene> WallScene = resourceLoader->load("res://Wall.tscn");
-    godot::Structure* wall = static_cast<godot::Structure*>(WallScene->instance());
+void Player::_build_in_grid_block(GridBlock* gridBlock, Action action) {
 
-    get_node("/root/Spatial")->add_child(wall);
+    GridBlock::Direction direction = GridBlock::Direction::Front;
     float rot = _get_grid_rotation();
-    wall->rotate(Vector3(0,1,0),rot);
-    wall->set_global_transform(Transform(wall->get_global_transform().basis,new_location));
+    Godot::print(std::to_string(rot).c_str());
+    if (rot == 0.0f) { direction = GridBlock::Direction::Front;}
+    if (rot == 90.0f) { direction = GridBlock::Direction::Left;}
+    if (rot == 180.0f) { direction = GridBlock::Direction::Back;}
+    if (rot == 270.0f) { direction = GridBlock::Direction::Right;}
 
+    switch (action)
+    {
+    case Action::Build_Ramp:
+        if(!gridBlock->_add_ramp(direction)) { Godot::print("Already Ramp There");}
+        
+        break;
+    case Action::Build_Wall:
+        gridBlock->_add_wall(direction);
+        break;
+    case Action::Build_Floor:
+        if (!gridBlock->_add_floor()) {
+            gridBlock->_add_ceiling();
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void Player::_shoot() {
-    Godot::print("Shoot");
     if (ray == nullptr) {
         Godot::print("Ray not found");
         return;
@@ -224,10 +241,7 @@ void Player::_shoot() {
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
-                Godot::print("Wall Hit");
                 structure->_take_damage(20);
-            } else {
-                Godot::print("Non Structure Hit");
             }
         } 
     }
