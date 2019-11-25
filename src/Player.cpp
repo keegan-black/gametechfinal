@@ -65,6 +65,12 @@ void Player::_physics_process(float delta) {
     camera = Object::cast_to<Camera>(get_node("KinematicBody/Camera"));
     ray = Object::cast_to<RayCast>(get_node("KinematicBody/Camera/RayCast"));
     FrontDirection front_direction = FrontDirection::None;
+
+    if (input == nullptr) {
+        Godot::print("No Input Found");
+        return;
+    }
+
     if (input->is_key_pressed(87)) {
         front_direction = FrontDirection::Forward;
     }
@@ -93,6 +99,7 @@ void Player::_physics_process(float delta) {
     } else {
         is_shooting = false;
     }
+
     if (input->is_key_pressed(82)) {
         if (!is_building) {
             is_building = true;
