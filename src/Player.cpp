@@ -9,7 +9,7 @@
 
 using namespace godot;
 #define PI 3.14
-#define GRID_SIZE 3
+#define GRID_SIZE 6
 
 void Player::_register_methods() {
 	register_method("_process", &Player::_process);
@@ -129,8 +129,6 @@ float Player::_get_grid_rotation() {
         current_rotation += 360;
     }
 
-    Godot::print(std::to_string(current_rotation).c_str());
-
     if (current_rotation >= 0 && current_rotation < 45) {
         return 0;
     } else if (current_rotation >= 45 && current_rotation < 135) {
@@ -179,7 +177,7 @@ void Player::_build(Player::Action action) {
 }
 
 void Player::_create_ramp_at(Vector3 floor_location) {
-    Vector3 new_location = Vector3((int) floor_location.x, (int) floor_location.y + 2, (int) floor_location.z);
+    Vector3 new_location = _to_grid_coordinate(floor_location + Vector3(0,1,0));
     Godot::print(new_location);
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> RampScene = resourceLoader->load("res://Ramp.tscn");
@@ -192,7 +190,7 @@ void Player::_create_ramp_at(Vector3 floor_location) {
 }
 
 void Player::_create_wall_at(Vector3 floor_location) {
-    Vector3 new_location = Vector3((int) floor_location.x, (int) floor_location.y + 2, (int) floor_location.z);
+    Vector3 new_location = _to_grid_coordinate(floor_location + Vector3(0,1,0));
     Godot::print(new_location);
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> WallScene = resourceLoader->load("res://Wall.tscn");
@@ -298,5 +296,13 @@ void Player::handle_move_action(Vector3& force, Player::MovementAction move_acti
 
 void Player::handle_gravity(Vector3& force, Vector3& curr_gravity) {
     force += curr_gravity;
+}
+
+Vector3 Player::_to_grid_coordinate(Vector3 location) {
+    Vector3 ret = Vector3(0,0,0);
+    ret.x = ((int) location.x / GRID_SIZE) * GRID_SIZE;
+    ret.y = ((int) location.y / GRID_SIZE) * GRID_SIZE;
+    ret.z = ((int) location.z / GRID_SIZE) * GRID_SIZE;
+    return ret;
 }
 

@@ -87,6 +87,8 @@ namespace godot {
 		void handle_gravity(Vector3& force, Vector3& gravity);
 		void handle_movement(Vector3& force, FrontDirection front_direction, SideDirection side_direction);
 		void handle_move_action(Vector3& force, MovementAction move_action);
+
+		Vector3 _to_grid_coordinate(Vector3 location);
 	};
 
 }
