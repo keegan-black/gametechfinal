@@ -160,19 +160,23 @@ void Player::_build(Player::Action action) {
     if (ray->is_colliding()) {
         Object* obj = ray->get_collider();
         StaticBody* body = Object::cast_to<StaticBody>(obj);
+        Area* area = Object::cast_to<Area>(obj);
         if (body != nullptr) {
+            Godot::print("Build - Static Body Found");
             if (body->get_name() == "FloorStaticBody") {
-                Godot::print("Found Floor");
+                Godot::print("Build - Floor Found");
                 _create_grid_block_at(ray->get_collision_point(), action);
-
             } else {
-                Godot::print("Found GridBlock");
-                GridBlock* gridBlock = Node::cast_to<GridBlock>(body->get_parent()->get_parent());
-                if (gridBlock != nullptr) {
-                    _build_in_grid_block(gridBlock, action);
-                }
+                Godot::print("Build - Non Buildable Surface Found");
             }
-        } 
+        } else if (area != nullptr) {
+            Godot::print("Build - Area found");
+            GridBlock* gridBlock = Node::cast_to<GridBlock>(area->get_parent());
+            if (gridBlock != nullptr) {
+                Godot::print("Build - Gridblock Found");
+                _build_in_grid_block(gridBlock, action);
+            }
+        }
     }
 
     ray->set_enabled(false);
