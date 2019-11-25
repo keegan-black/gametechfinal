@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Structure.h"
 #include <KinematicCollision.hpp>
 #include <SceneTree.hpp>
 #include <ResourceLoader.hpp>
@@ -123,63 +124,17 @@ void Player::_shoot() {
         Object* obj = ray->get_collider();
         StaticBody* body = Object::cast_to<StaticBody>(obj);
         if (body != nullptr) {
-            Godot::print(body->get_name());
-        } else {
-            Godot::print("Unidentified Body");
-        }
-    } else {
-        Godot::print("No RayCast Collision");
+            Structure* structure = Node::cast_to<Structure>(body->get_parent());
+            if (structure != nullptr) {
+                Godot::print("Wall Hit");
+                structure->_take_damage(20);
+            } else {
+                Godot::print("Non Structure Hit");
+            }
+        } 
     }
 
     ray->set_enabled(false);
-    /*
-    ray->set_collide_with_areas(true);
-    ray->set_collide_with_bodies(false);
-
-    GridTile* front = nullptr;
-    GridTile* back = nullptr;
-    GridTile* left = nullptr;
-    GridTile* right = nullptr;
-    
-    ray->set_enabled(true);
-    //Front x
-    ray->set_cast_to(Vector3(2,0,0));
-    ray->force_raycast_update();
-    if (ray->is_colliding()) {
-        Object* obj = ray->get_collider();
-        Area* area = Object::cast_to<Area>(obj);
-        front = Object::cast_to<GridTile>(area->get_parent());
-    }
-
-    //Back -x 
-    ray->set_cast_to(Vector3(-2,0,0));
-    ray->force_raycast_update();
-    if (ray->is_colliding()) {
-        Object* obj = ray->get_collider();
-        Area* area = Object::cast_to<Area>(obj);
-        back = Object::cast_to<GridTile>(area->get_parent());
-    }
-
-    //Left z
-    ray->set_cast_to(Vector3(0,0,2));
-    ray->force_raycast_update();
-    if (ray->is_colliding()) {
-        Object* obj = ray->get_collider();
-        Area* area = Object::cast_to<Area>(obj);
-        left = Object::cast_to<GridTile>(area->get_parent());
-    }
-
-    //Right -z
-    ray->set_cast_to(Vector3(0,0,-2));
-    ray->force_raycast_update();
-    if (ray->is_colliding()) {
-        Object* obj = ray->get_collider();
-        Area* area = Object::cast_to<Area>(obj);
-        right = Object::cast_to<GridTile>(area->get_parent());
-    }
-
-    ray->set_enabled(false);
-    */
 
 }
 
