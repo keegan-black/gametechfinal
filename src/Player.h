@@ -11,6 +11,7 @@
 #include <InputEvent.hpp>
 #include <KinematicBody.hpp>
 #include <Camera.hpp>
+#include <RayCast.hpp>
 
 namespace godot {
 
@@ -45,14 +46,21 @@ namespace godot {
             None, Jump
         };
 
+		enum class Action {
+			None, Shoot
+		};
+
 		KinematicBody* me;
 		Camera* camera;
+		RayCast* ray;
 
 		float moveSpeed;
 		float jumpForce;
 
 		Vector3 gravity;
 		Vector3 terminal_velocity = Vector3(10,10,10);
+
+		bool is_shooting = false;
 
 		static void _register_methods();
 
@@ -65,10 +73,12 @@ namespace godot {
 		void _physics_process(float delta);
 		void _input(InputEvent *event);
         void _move(FrontDirection front_direction, SideDirection side_direction, MovementAction action);
+		void _perform_action(Action action);
 		void _ready();
 
 	private:
 
+		void _shoot();
 		void handle_gravity(Vector3& force, Vector3& gravity);
 		void handle_movement(Vector3& force, FrontDirection front_direction, SideDirection side_direction);
 		void handle_move_action(Vector3& force, MovementAction move_action);

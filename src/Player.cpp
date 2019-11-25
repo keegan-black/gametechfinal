@@ -4,6 +4,7 @@
 #include <ResourceLoader.hpp>
 #include <PackedScene.hpp>
 #include <InputEventMouseMotion.hpp>
+#include <StaticBody.hpp>
 
 using namespace godot;
 #define PI 3.14
@@ -51,7 +52,6 @@ void Player::_input(InputEvent* event) {
 
         float pan = -m->get_relative().y * mouse_y_sensitivity;
         if (camera_angle + pan < 90 && camera_angle + pan > -90 && camera != nullptr) {
-            Godot::print("Rotate Camera!");
             camera->rotate_x(pan * PI/180.0);
             camera_angle += pan;
         }
@@ -61,6 +61,7 @@ void Player::_input(InputEvent* event) {
 void Player::_physics_process(float delta) {
     me = Object::cast_to<KinematicBody>(get_node("KinematicBody"));
     camera = Object::cast_to<Camera>(get_node("KinematicBody/Camera"));
+    ray = Object::cast_to<RayCast>(get_node("KinematicBody/Camera/RayCast"));
     FrontDirection front_direction = FrontDirection::None;
     if (input->is_key_pressed(87)) {
         front_direction = FrontDirection::Forward;
@@ -81,9 +82,105 @@ void Player::_physics_process(float delta) {
         move_action = MovementAction::Jump;
     }
 
+    Action action = Action::None;
+    if (input->is_key_pressed(70)) {
+        if (!is_shooting) {
+            is_shooting = true;
+            action = Action::Shoot;
+        }
+    } else {
+        is_shooting = false;
+    }
+
+    _perform_action(action);
     _move(front_direction, side_direction, move_action);
 	
 	
+}
+
+void Player::_perform_action(Player::Action action) {
+    if (action == Action::Shoot) {
+        _shoot();
+    }
+}
+
+void Player::_shoot() {
+    Godot::print("Shooting!");
+    if (ray == nullptr) {
+        Godot::print("Ray not found");
+        return;
+    }
+
+    ray->set_collide_with_areas(false);
+    ray->set_collide_with_bodies(true);
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(0,0,-20));
+    ray->force_raycast_update();
+
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        if (body != nullptr) {
+            Godot::print(body->get_name());
+        } else {
+            Godot::print("Unidentified Body");
+        }
+    } else {
+        Godot::print("No RayCast Collision");
+    }
+
+    ray->set_enabled(false);
+    /*
+    ray->set_collide_with_areas(true);
+    ray->set_collide_with_bodies(false);
+
+    GridTile* front = nullptr;
+    GridTile* back = nullptr;
+    GridTile* left = nullptr;
+    GridTile* right = nullptr;
+    
+    ray->set_enabled(true);
+    //Front x
+    ray->set_cast_to(Vector3(2,0,0));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        Area* area = Object::cast_to<Area>(obj);
+        front = Object::cast_to<GridTile>(area->get_parent());
+    }
+
+    //Back -x 
+    ray->set_cast_to(Vector3(-2,0,0));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        Area* area = Object::cast_to<Area>(obj);
+        back = Object::cast_to<GridTile>(area->get_parent());
+    }
+
+    //Left z
+    ray->set_cast_to(Vector3(0,0,2));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        Area* area = Object::cast_to<Area>(obj);
+        left = Object::cast_to<GridTile>(area->get_parent());
+    }
+
+    //Right -z
+    ray->set_cast_to(Vector3(0,0,-2));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        Area* area = Object::cast_to<Area>(obj);
+        right = Object::cast_to<GridTile>(area->get_parent());
+    }
+
+    ray->set_enabled(false);
+    */
+
 }
 
 void Player::_move(Player::FrontDirection front_direction, Player::SideDirection side_direction, Player::MovementAction move_action) {
