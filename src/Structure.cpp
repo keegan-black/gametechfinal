@@ -5,6 +5,7 @@
 #include <PackedScene.hpp>
 #include <InputEventMouseMotion.hpp>
 #include <StaticBody.hpp>
+#include "GridBlock.h"
 
 using namespace godot;
 #define PI 3.14
@@ -30,6 +31,10 @@ void Structure::_init() {
 void Structure::_take_damage(float damage) {
     health -= damage;
     if (health < 0) {
+        GridBlock* gridBlock = Node::cast_to<GridBlock>(this->get_parent());
+        if (gridBlock != nullptr) {
+            gridBlock->_clear_structure_pointer_if_exists(this);
+        }
         free();
     }
 }

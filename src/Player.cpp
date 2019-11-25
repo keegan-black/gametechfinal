@@ -110,6 +110,11 @@ void Player::_physics_process(float delta) {
             is_building = true;
             action = Action::Build_Ramp;
         }  
+    } else if(input->is_key_pressed(69)) {
+        if (!is_building) {
+            is_building = true;
+            action = Action::Build_Floor;
+        }  
     } else {
         is_building = false;
     }
@@ -124,7 +129,7 @@ void Player::_perform_action(Player::Action action) {
     if (action == Action::Shoot) {
         _shoot();
     }
-    if (action == Action::Build_Wall || action == Action::Build_Ramp) {
+    if (action == Action::Build_Wall || action == Action::Build_Ramp || action == Action::Build_Floor) {
         _build(action);
     }
 }

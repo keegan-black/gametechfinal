@@ -48,6 +48,7 @@ namespace godot {
         bool _add_ceiling();
 
         void _clear_structure_pointers();
+        void _clear_structure_pointer_if_exists(Structure* pointer);
 
 	private:
         bool _has_left_wall();

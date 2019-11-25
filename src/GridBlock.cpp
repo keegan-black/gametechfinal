@@ -127,7 +127,7 @@ bool GridBlock::_add_ceiling() {
     if (_has_ceiling()) { return false; }
 
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
-    Ref<PackedScene> ceilingScene = resourceLoader->load("res://Floor.tscn");
+    Ref<PackedScene> ceilingScene = resourceLoader->load("res://Ceiling.tscn");
     godot::Structure* ceiling = static_cast<godot::Structure*>(ceilingScene->instance());
 
     this->ceiling = ceiling;
@@ -179,6 +179,24 @@ bool GridBlock::_has_back_wall() {
 }
 bool GridBlock::_has_front_wall() {
     return front_wall != nullptr;
+}
+
+void GridBlock::_clear_structure_pointer_if_exists(Structure* pointer) {
+    if (ramp == pointer) {
+        ramp = nullptr;
+    } else if (ceiling == pointer) {
+        ceiling = nullptr;
+    } else if (left_wall == pointer) {
+        left_wall = nullptr;
+    } else if (right_wall == pointer) {
+        right_wall = nullptr;
+    } else if (back_wall == pointer) {
+        back_wall = nullptr;
+    } else if (front_wall == pointer) {
+        front_wall = nullptr;
+    } else if (floor == pointer) {
+        floor = nullptr;
+    }
 }
 
 void GridBlock::_clear_structure_pointers() {
