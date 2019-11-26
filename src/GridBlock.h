@@ -12,13 +12,6 @@ namespace godot {
 
 	private:
 
-        Structure* floor = nullptr;
-        Structure* ceiling = nullptr;
-        Structure* front_wall = nullptr;
-        Structure* back_wall = nullptr;
-        Structure* left_wall = nullptr;
-        Structure* right_wall = nullptr;
-
 	public:
         Structure* ramp = nullptr;
 
@@ -37,24 +30,25 @@ namespace godot {
         void _process(float delta);
         void _ready();
 
-        bool _has_floor();
-        bool _has_ceiling();
         bool _has_ramp();
+
+        Structure* _has_floor();
+        Structure* _has_ceiling();
+        Structure* _has_left_wall();
+        Structure* _has_right_wall();
+        Structure* _has_back_wall();
+        Structure* _has_front_wall();
+
         bool _has_wall(Direction type);
 
         bool _add_wall(Direction type);
         bool _add_ramp(Direction direction);
         bool _add_floor();
         bool _add_ceiling();
-
-        void _clear_structure_pointers();
-        void _clear_structure_pointer_if_exists(Structure* pointer);
+        void _check_neighbors();
 
 	private:
-        bool _has_left_wall();
-        bool _has_right_wall();
-        bool _has_back_wall();
-        bool _has_front_wall();
+        
 	};
 
 }

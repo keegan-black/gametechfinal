@@ -5,6 +5,7 @@
 #include <PackedScene.hpp>
 #include <InputEventMouseMotion.hpp>
 #include <StaticBody.hpp>
+#include <RayCast.hpp>
 
 using namespace godot;
 #define PI 3.14
@@ -24,19 +25,47 @@ GridBlock::~GridBlock() {
 
 void GridBlock::_init() {
 	ramp = nullptr;
-    ceiling = nullptr;
-    left_wall = nullptr;
-    right_wall = nullptr;
-    back_wall = nullptr;
-    front_wall = nullptr;
-    floor = nullptr;
 }
 
 void GridBlock::_ready(){
+    ramp = nullptr;
+}
+
+void GridBlock::_check_neighbors() {
+
+    Godot::print("Checking Neighbors");
+
+    Structure* n_front_wall = _has_front_wall();
+    Structure* n_back_wall = _has_back_wall();
+    Structure* n_left_wall = _has_left_wall();
+    Structure* n_right_wall = _has_right_wall();
+    Structure* n_ceiling = _has_ceiling();
+    Structure* n_floor = _has_floor();
+
+    if (n_front_wall != nullptr) {
+        Godot::print("Found front wall");
+    }
+    if (n_back_wall != nullptr) {
+        Godot::print("Found back wall");
+    }
+    if (n_left_wall != nullptr) {
+        Godot::print("Found left wall");
+    }
+    if (n_right_wall != nullptr) {
+        Godot::print("Found right wall");
+    }
+    if (n_ceiling != nullptr) {
+        Godot::print("Found ceiling");
+    }
+    if (n_floor != nullptr) {
+        Godot::print("Found floor");
+    }
 }
 
 bool GridBlock::_add_wall(Direction type) {
-    if (_has_wall(type)) { return false;}
+    if (_has_wall(type)) { 
+        Godot::print("GridBlock: Wall Already Exists");
+        return false;}
 
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> WallScene = resourceLoader->load("res://Wall.tscn");
@@ -48,19 +77,15 @@ bool GridBlock::_add_wall(Direction type) {
     {
     case Direction::Front:
         rot = 0;
-        front_wall = wall;
         break;
     case Direction::Back:
         rot = 180 * PI/180;
-        back_wall = wall;
         break;
     case Direction::Left:
         rot = 90 * PI/180;
-        left_wall = wall;
         break;
     case Direction::Right:
         rot = 270 * PI/180;
-        right_wall = wall;
         break;
     
     default:
@@ -68,7 +93,6 @@ bool GridBlock::_add_wall(Direction type) {
     }
     wall->rotate(Vector3(0,1,0),rot);
     wall->set_translation(Vector3(0,0,0));
-    Godot::print(wall->get_global_transform());
     return true;
 
 }
@@ -107,41 +131,104 @@ bool GridBlock::_add_ramp(Direction direction) {
     ramp->rotate(Vector3(0,1,0),rot);
     ramp->set_translation(Vector3(0,0,0));
 
-    Godot::print(ramp->get_global_transform());
     return true;
 
 }
 bool GridBlock::_add_floor() {
-    if (_has_floor()) { return false; }
+    if (_has_floor() != nullptr) { 
+        Godot::print("GridBlock: Floor Already Exists");
+        return false; }
 
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> floorScene = resourceLoader->load("res://Floor.tscn");
     Structure* floor = Node::cast_to<Structure>(floorScene->instance());
 
-    this->floor = floor;
     this->add_child(floor);
     floor->set_translation(Vector3(0,0,0));
     return true;
 }
 bool GridBlock::_add_ceiling() {
-    if (_has_ceiling()) { return false; }
+    if (_has_ceiling() != nullptr) { 
+        Godot::print("GridBlock: Ceiling Already Exists");
+        return false; }
 
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> ceilingScene = resourceLoader->load("res://Ceiling.tscn");
     Structure* ceiling = Node::cast_to<Structure>(ceilingScene->instance());
 
-    this->ceiling = ceiling;
     this->add_child(ceiling);
     ceiling->set_translation(Vector3(0,0,0));
     return true;
 
 }
 
-bool GridBlock::_has_floor() {
-    return floor != nullptr;
+Structure* GridBlock::_has_floor() {
+
+    RayCast* ray = Object::cast_to<RayCast>(get_node("RayCast"));
+    if (ray == nullptr) {
+        Godot::print("Couldn't find ray node");
+        return nullptr;
+    }
+
+    Godot::print("Checking Floor");
+
+    ray->set_collide_with_areas(false);
+    ray->set_collide_with_bodies(true);
+
+    Structure* structure = nullptr;
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(0,-3,0));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        if (body != nullptr) {
+            Node* parent = body->get_parent();
+            if (parent != nullptr) {
+                structure = Node::cast_to<Structure>(parent->get_parent());
+            }
+        }
+    }
+
+    ray->set_enabled(false);
+
+    return structure;
+
 }
-bool GridBlock::_has_ceiling() {
-    return ceiling != nullptr;
+Structure* GridBlock::_has_ceiling() {
+    RayCast* ray = Object::cast_to<RayCast>(get_node("RayCast"));
+    if (ray == nullptr) {
+        Godot::print("Couldn't find ray node");
+        return nullptr;
+    }
+
+    Godot::print("Checking Ceiling");
+
+    ray->set_collide_with_areas(false);
+    ray->set_collide_with_bodies(true);
+
+    Structure* structure = nullptr;
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(0,3,0));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        if (body != nullptr) {
+            Node* parent = body->get_parent();
+            if (parent != nullptr) {
+                structure = Node::cast_to<Structure>(parent->get_parent());
+            }
+        }
+    }
+
+    ray->set_enabled(false);
+
+    return structure;
 }
 bool GridBlock::_has_ramp() {
     return ramp != nullptr;
@@ -150,16 +237,16 @@ bool GridBlock::_has_wall(Direction type) {
     switch (type)
     {
     case Direction::Front:
-        if (_has_front_wall()) { return false; }
+        if (_has_front_wall() != nullptr) { return true; }
         break;
     case Direction::Back:
-        if (_has_back_wall()) { return false; }
+        if (_has_back_wall() != nullptr) { return true; }
         break;
     case Direction::Left:
-        if (_has_left_wall()) { return false; }
+        if (_has_left_wall() != nullptr) { return true; }
         break;
     case Direction::Right:
-        if (_has_right_wall()) { return false; }
+        if (_has_right_wall() != nullptr) { return true; }
         break;
     
     default:
@@ -167,46 +254,139 @@ bool GridBlock::_has_wall(Direction type) {
         break;
     }
     return false;
+    
 }
-bool GridBlock::_has_left_wall() {
-    return left_wall != nullptr;
-}
-bool GridBlock::_has_right_wall() {
-    return right_wall != nullptr;
-}
-bool GridBlock::_has_back_wall() {
-    return back_wall != nullptr;
-}
-bool GridBlock::_has_front_wall() {
-    return front_wall != nullptr;
-}
-
-void GridBlock::_clear_structure_pointer_if_exists(Structure* pointer) {
-    if (ramp == pointer) {
-        ramp = nullptr;
-    } else if (ceiling == pointer) {
-        ceiling = nullptr;
-    } else if (left_wall == pointer) {
-        left_wall = nullptr;
-    } else if (right_wall == pointer) {
-        right_wall = nullptr;
-    } else if (back_wall == pointer) {
-        back_wall = nullptr;
-    } else if (front_wall == pointer) {
-        front_wall = nullptr;
-    } else if (floor == pointer) {
-        floor = nullptr;
+Structure* GridBlock::_has_left_wall() {
+    RayCast* ray = Object::cast_to<RayCast>(get_node("RayCast"));
+    if (ray == nullptr) {
+        Godot::print("Couldn't find ray node");
+        return nullptr;
     }
-}
 
-void GridBlock::_clear_structure_pointers() {
-    ramp = nullptr;
-    ceiling = nullptr;
-    left_wall = nullptr;
-    right_wall = nullptr;
-    back_wall = nullptr;
-    front_wall = nullptr;
-    floor = nullptr;
+    Godot::print("Checking Left Wall");
+
+    ray->set_collide_with_areas(false);
+    ray->set_collide_with_bodies(true);
+
+    Structure* structure = nullptr;
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(-3,0,0));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        if (body != nullptr) {
+            Node* parent = body->get_parent();
+            if (parent != nullptr) {
+                structure = Node::cast_to<Structure>(parent->get_parent());
+            }
+        }
+    }
+
+    ray->set_enabled(false);
+
+    return structure;
+}
+Structure* GridBlock::_has_right_wall() {
+    RayCast* ray = Object::cast_to<RayCast>(get_node("RayCast"));
+    if (ray == nullptr) {
+        Godot::print("Couldn't find ray node");
+        return nullptr;
+    }
+
+    Godot::print("Checking Right Wall");
+
+    ray->set_collide_with_areas(false);
+    ray->set_collide_with_bodies(true);
+
+    Structure* structure = nullptr;
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(3,0,0));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        if (body != nullptr) {
+            Node* parent = body->get_parent();
+            if (parent != nullptr) {
+                structure = Node::cast_to<Structure>(parent->get_parent());
+            }
+        }
+    }
+
+    ray->set_enabled(false);
+
+    return structure;
+}
+Structure* GridBlock::_has_back_wall() {
+    RayCast* ray = Object::cast_to<RayCast>(get_node("RayCast"));
+    if (ray == nullptr) {
+        Godot::print("Couldn't find ray node");
+        return nullptr;
+    }
+
+    Godot::print("Checking Back Wall");
+
+    ray->set_collide_with_areas(false);
+    ray->set_collide_with_bodies(true);
+
+    Structure* structure = nullptr;
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(0,0,-3));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        if (body != nullptr) {
+            Node* parent = body->get_parent();
+            if (parent != nullptr) {
+                structure = Node::cast_to<Structure>(parent->get_parent());
+            }
+        }
+    }
+
+    ray->set_enabled(false);
+
+    return structure;
+}
+Structure* GridBlock::_has_front_wall() {
+    RayCast* ray = Object::cast_to<RayCast>(get_node("RayCast"));
+    if (ray == nullptr) {
+        Godot::print("Couldn't find ray node");
+        return nullptr;
+    }
+
+    Godot::print("Checking Front Wall");
+
+    ray->set_collide_with_areas(false);
+    ray->set_collide_with_bodies(true);
+
+    Structure* structure = nullptr;
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(0,0,3));
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        if (body != nullptr) {
+            Node* parent = body->get_parent();
+            if (parent != nullptr) {
+                structure = Node::cast_to<Structure>(parent->get_parent());
+            }
+        }
+    }
+
+    ray->set_enabled(false);
+
+    return structure;
 }
 
 void GridBlock::_process(float delta) {

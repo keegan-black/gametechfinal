@@ -209,11 +209,8 @@ void Player::_create_grid_block_at(Vector3 floor_location, Action action) {
         return;
     }
 
-    gridBlock->_clear_structure_pointers();
-
     get_tree()->get_root()->add_child(gridBlock);
     gridBlock->set_global_transform(Transform(gridBlock->get_global_transform().basis,new_location));
-
     _build_in_grid_block(gridBlock, action);
 }
 
@@ -221,7 +218,6 @@ void Player::_build_in_grid_block(GridBlock* gridBlock, Action action) {
 
     GridBlock::Direction direction = GridBlock::Direction::Front;
     float rot = _get_grid_rotation();
-    Godot::print(std::to_string(rot).c_str());
     if (rot == 0.0f) { direction = GridBlock::Direction::Front;}
     if (rot == 90.0f) { direction = GridBlock::Direction::Left;}
     if (rot == 180.0f) { direction = GridBlock::Direction::Back;}
