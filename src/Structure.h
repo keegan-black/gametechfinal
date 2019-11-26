@@ -6,8 +6,8 @@
 
 namespace godot {
 
-	class Structure : public Area {
-		GODOT_CLASS(Structure, Area)
+	class Structure : public Spatial {
+		GODOT_CLASS(Structure, Spatial)
 
 	private:
 		

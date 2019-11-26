@@ -16,8 +16,8 @@
 
 namespace godot {
 
-	class Player : public Area {
-		GODOT_CLASS(Player, Area)
+	class Player : public Spatial {
+		GODOT_CLASS(Player, Spatial)
 
 	private:
 		

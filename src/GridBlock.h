@@ -7,8 +7,8 @@
 
 namespace godot {
 
-	class GridBlock : public Area {
-		GODOT_CLASS(GridBlock, Area)
+	class GridBlock : public Spatial {
+		GODOT_CLASS(GridBlock, Spatial)
 
 	private:
 
@@ -29,13 +29,13 @@ namespace godot {
 
         static void _register_methods();
 
-		GridBlock();
-		~GridBlock();
+        GridBlock();
+        ~GridBlock();
 
-		void _init(); // our initializer called by Godot
+        void _init(); // our initializer called by Godot
 
-		void _process(float delta);
-		void _ready();
+        void _process(float delta);
+        void _ready();
 
         bool _has_floor();
         bool _has_ceiling();

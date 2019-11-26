@@ -6,6 +6,8 @@
 #include <PackedScene.hpp>
 #include <InputEventMouseMotion.hpp>
 #include <StaticBody.hpp>
+#include <SceneTree.hpp>
+#include <Viewport.hpp>
 
 using namespace godot;
 #define PI 3.14
@@ -27,7 +29,6 @@ Player::~Player() {
 
 
 void Player::_init() {
-	input = Input::get_singleton();
 	moveSpeed = 10;
 	jumpForce = 100;
 	velocity = Vector3(0,0,0);
@@ -36,7 +37,11 @@ void Player::_init() {
 }
 
 void Player::_ready(){
+    input = Input::get_singleton();
     input->set_mouse_mode(Input::MOUSE_MODE_HIDDEN);
+    me = Object::cast_to<KinematicBody>(get_node("KinematicBody"));
+    camera = Object::cast_to<Camera>(get_node("KinematicBody/Camera"));
+    ray = Object::cast_to<RayCast>(get_node("KinematicBody/Camera/RayCast"));
 }
 
 void Player::_process(float delta) {
@@ -61,9 +66,7 @@ void Player::_input(InputEvent* event) {
 }
 
 void Player::_physics_process(float delta) {
-    me = Object::cast_to<KinematicBody>(get_node("KinematicBody"));
-    camera = Object::cast_to<Camera>(get_node("KinematicBody/Camera"));
-    ray = Object::cast_to<RayCast>(get_node("KinematicBody/Camera/RayCast"));
+
     FrontDirection front_direction = FrontDirection::None;
 
     if (input == nullptr) {
@@ -154,8 +157,6 @@ float Player::_get_grid_rotation() {
 }
 
 void Player::_build(Player::Action action) {
-    Godot::print("Build");
-
     if (ray == nullptr) {
         Godot::print("Ray not found");
         return;
@@ -171,6 +172,10 @@ void Player::_build(Player::Action action) {
 
     if (ray->is_colliding()) {
         Object* obj = ray->get_collider();
+        if (obj == nullptr) {
+            Godot::print("Collision Object Not Found");
+            return;
+        }
         StaticBody* body = Object::cast_to<StaticBody>(obj);
         Area* area = Object::cast_to<Area>(obj);
         if (body != nullptr) {
@@ -195,14 +200,27 @@ void Player::_build(Player::Action action) {
 }
 
 void Player::_create_grid_block_at(Vector3 floor_location, Action action) {
+    Godot::print("Entered create grid box");
     Vector3 new_location = _to_grid_coordinate(floor_location);
-    Godot::print(new_location);
+    Godot::print("Got grid box create location");
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
+
+    if (resourceLoader == nullptr) {
+        Godot::print("[ERROR] Resource Loader Null");
+        return;
+    }
+
     Ref<PackedScene> gridScene = resourceLoader->load("res://GridBlock.tscn");
-    godot::GridBlock* gridBlock = static_cast<godot::GridBlock*>(gridScene->instance());
+    GridBlock* gridBlock = Node::cast_to<GridBlock>(gridScene->instance());
+
+    if (gridBlock == nullptr) {
+        Godot::print("[ERROR] Gridblock is null");
+        return;
+    }
+
     gridBlock->_clear_structure_pointers();
 
-    get_node("/root/Spatial")->add_child(gridBlock);
+    get_tree()->get_root()->add_child(gridBlock);
     gridBlock->set_global_transform(Transform(gridBlock->get_global_transform().basis,new_location));
 
     _build_in_grid_block(gridBlock, action);

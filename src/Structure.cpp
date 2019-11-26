@@ -35,7 +35,7 @@ void Structure::_take_damage(float damage) {
         if (gridBlock != nullptr) {
             gridBlock->_clear_structure_pointer_if_exists(this);
         }
-        free();
+        this->queue_free();
     }
 }
 

@@ -40,7 +40,7 @@ bool GridBlock::_add_wall(Direction type) {
 
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> WallScene = resourceLoader->load("res://Wall.tscn");
-    godot::Structure* wall = static_cast<godot::Structure*>(WallScene->instance());
+    godot::Structure* wall = Node::cast_to<Structure>(WallScene->instance());
 
     this->add_child(wall);
     float rot = 0;
@@ -79,7 +79,7 @@ bool GridBlock::_add_ramp(Direction direction) {
 
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> rampScene = resourceLoader->load("res://Ramp.tscn");
-    godot::Structure* ramp = static_cast<godot::Structure*>(rampScene->instance());
+    Structure* ramp = Node::cast_to<Structure>(rampScene->instance());
 
     this->ramp = ramp;
 
@@ -116,7 +116,7 @@ bool GridBlock::_add_floor() {
 
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> floorScene = resourceLoader->load("res://Floor.tscn");
-    godot::Structure* floor = static_cast<godot::Structure*>(floorScene->instance());
+    Structure* floor = Node::cast_to<Structure>(floorScene->instance());
 
     this->floor = floor;
     this->add_child(floor);
@@ -128,7 +128,7 @@ bool GridBlock::_add_ceiling() {
 
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> ceilingScene = resourceLoader->load("res://Ceiling.tscn");
-    godot::Structure* ceiling = static_cast<godot::Structure*>(ceilingScene->instance());
+    Structure* ceiling = Node::cast_to<Structure>(ceilingScene->instance());
 
     this->ceiling = ceiling;
     this->add_child(ceiling);
@@ -210,12 +210,4 @@ void GridBlock::_clear_structure_pointers() {
 }
 
 void GridBlock::_process(float delta) {
-    // if (!_has_back_wall() &&
-    //     !_has_front_wall() &&
-    //     !_has_left_wall() &&
-    //     !_has_right_wall() &&
-    //     !_has_ceiling() &&
-    //     !_has_floor()) {
-    //         free();
-    //     }
 }
