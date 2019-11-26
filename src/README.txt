@@ -11,6 +11,13 @@ mechanics that will be implemented later.
 
 *****CONTROLS*****
 
+Movement:
+
+WASD to move
+Mouse movement to pan camera
+
+Building:
+
 E: Build Floor/Ceiling
 R: Build Wall
 F: Build Ramp
