@@ -94,7 +94,7 @@ void Player::_physics_process(float delta) {
     }
 
     Action action = Action::None;
-    if (input->is_key_pressed(70)) {
+    if (input->is_key_pressed(84)) { // T
         if (!is_shooting) {
             is_shooting = true;
             action = Action::Shoot;
@@ -103,17 +103,17 @@ void Player::_physics_process(float delta) {
         is_shooting = false;
     }
 
-    if (input->is_key_pressed(82)) {
+    if (input->is_key_pressed(82)) { // R
         if (!is_building) {
             is_building = true;
             action = Action::Build_Wall;
         }  
-    } else if(input->is_key_pressed(84)) {
+    } else if(input->is_key_pressed(70)) { // F
         if (!is_building) {
             is_building = true;
             action = Action::Build_Ramp;
         }  
-    } else if(input->is_key_pressed(69)) {
+    } else if(input->is_key_pressed(69)) { // E
         if (!is_building) {
             is_building = true;
             action = Action::Build_Floor;
@@ -173,24 +173,17 @@ void Player::_build(Player::Action action) {
     if (ray->is_colliding()) {
         Object* obj = ray->get_collider();
         if (obj == nullptr) {
-            Godot::print("Collision Object Not Found");
             return;
         }
         StaticBody* body = Object::cast_to<StaticBody>(obj);
         Area* area = Object::cast_to<Area>(obj);
         if (body != nullptr) {
-            Godot::print("Build - Static Body Found");
             if (body->get_name() == "FloorStaticBody") {
-                Godot::print("Build - Floor Found");
                 _create_grid_block_at(ray->get_collision_point(), action);
-            } else {
-                Godot::print("Build - Non Buildable Surface Found");
             }
         } else if (area != nullptr) {
-            Godot::print("Build - Area found");
             GridBlock* gridBlock = Node::cast_to<GridBlock>(area->get_parent());
             if (gridBlock != nullptr) {
-                Godot::print("Build - Gridblock Found");
                 _build_in_grid_block(gridBlock, action);
             }
         }
@@ -200,9 +193,7 @@ void Player::_build(Player::Action action) {
 }
 
 void Player::_create_grid_block_at(Vector3 floor_location, Action action) {
-    Godot::print("Entered create grid box");
     Vector3 new_location = _to_grid_coordinate(floor_location);
-    Godot::print("Got grid box create location");
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
 
     if (resourceLoader == nullptr) {
@@ -239,8 +230,7 @@ void Player::_build_in_grid_block(GridBlock* gridBlock, Action action) {
     switch (action)
     {
     case Action::Build_Ramp:
-        if(!gridBlock->_add_ramp(direction)) { Godot::print("Already Ramp There");}
-        
+        gridBlock->_add_ramp(direction);
         break;
     case Action::Build_Wall:
         gridBlock->_add_wall(direction);
@@ -305,7 +295,7 @@ void Player::_move(Player::FrontDirection front_direction, Player::SideDirection
     if (velocity.y < -1 * terminal_velocity.y) { velocity.y = -1 * terminal_velocity.y;}
     if (velocity.z < -1 * terminal_velocity.z) { velocity.z = -1 * terminal_velocity.z;}
 
-    velocity = me->move_and_slide(velocity, Vector3(0,1,0));
+    velocity = me->move_and_slide(velocity, Vector3(0,1,0),true);
     
     velocity = velocity.linear_interpolate(Vector3(0,0,0),.2);
 }
