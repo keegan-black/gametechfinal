@@ -35,6 +35,14 @@ void Structure::_take_damage(float damage) {
     }
 }
 
+void Structure::_set_type(Type type) {
+    this->type = type;
+}
+
+Structure::Type Structure::_get_type() {
+    return this->type;
+}
+
 void Structure::_ready(){
 }
 

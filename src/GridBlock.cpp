@@ -70,7 +70,7 @@ bool GridBlock::_add_wall(Direction type) {
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> WallScene = resourceLoader->load("res://Wall.tscn");
     godot::Structure* wall = Node::cast_to<Structure>(WallScene->instance());
-
+    wall->_set_type(Structure::Type::Wall);
     this->add_child(wall);
     float rot = 0;
     switch (type)
@@ -104,7 +104,7 @@ bool GridBlock::_add_ramp(Direction direction) {
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> rampScene = resourceLoader->load("res://Ramp.tscn");
     Structure* ramp = Node::cast_to<Structure>(rampScene->instance());
-
+    ramp->_set_type(Structure::Type::Ramp);
     this->ramp = ramp;
 
     this->add_child(ramp);
@@ -142,7 +142,7 @@ bool GridBlock::_add_floor() {
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> floorScene = resourceLoader->load("res://Floor.tscn");
     Structure* floor = Node::cast_to<Structure>(floorScene->instance());
-
+    floor->_set_type(Structure::Type::Floor);
     this->add_child(floor);
     floor->set_translation(Vector3(0,0,0));
     return true;
@@ -155,7 +155,7 @@ bool GridBlock::_add_ceiling() {
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
     Ref<PackedScene> ceilingScene = resourceLoader->load("res://Ceiling.tscn");
     Structure* ceiling = Node::cast_to<Structure>(ceilingScene->instance());
-
+    ceiling->_set_type(Structure::Type::Floor);
     this->add_child(ceiling);
     ceiling->set_translation(Vector3(0,0,0));
     return true;
@@ -188,6 +188,9 @@ Structure* GridBlock::_has_floor() {
             Node* parent = body->get_parent();
             if (parent != nullptr) {
                 structure = Node::cast_to<Structure>(parent->get_parent());
+                if (structure != nullptr && structure->_get_type() != Structure::Type::Floor) {
+                    structure = nullptr;
+                }
             }
         }
     }
@@ -222,6 +225,9 @@ Structure* GridBlock::_has_ceiling() {
             Node* parent = body->get_parent();
             if (parent != nullptr) {
                 structure = Node::cast_to<Structure>(parent->get_parent());
+                if (structure != nullptr && structure->_get_type() != Structure::Type::Floor) {
+                    structure = nullptr;
+                }
             }
         }
     }
@@ -281,6 +287,9 @@ Structure* GridBlock::_has_left_wall() {
             Node* parent = body->get_parent();
             if (parent != nullptr) {
                 structure = Node::cast_to<Structure>(parent->get_parent());
+                if (structure != nullptr && structure->_get_type() != Structure::Type::Wall) {
+                    structure = nullptr;
+                }
             }
         }
     }
@@ -314,6 +323,9 @@ Structure* GridBlock::_has_right_wall() {
             Node* parent = body->get_parent();
             if (parent != nullptr) {
                 structure = Node::cast_to<Structure>(parent->get_parent());
+                if (structure != nullptr && structure->_get_type() != Structure::Type::Wall) {
+                    structure = nullptr;
+                }
             }
         }
     }
@@ -347,6 +359,9 @@ Structure* GridBlock::_has_back_wall() {
             Node* parent = body->get_parent();
             if (parent != nullptr) {
                 structure = Node::cast_to<Structure>(parent->get_parent());
+                if (structure != nullptr && structure->_get_type() != Structure::Type::Wall) {
+                    structure = nullptr;
+                }
             }
         }
     }
@@ -380,6 +395,9 @@ Structure* GridBlock::_has_front_wall() {
             Node* parent = body->get_parent();
             if (parent != nullptr) {
                 structure = Node::cast_to<Structure>(parent->get_parent());
+                if (structure != nullptr && structure->_get_type() != Structure::Type::Wall) {
+                    structure = nullptr;
+                }
             }
         }
     }

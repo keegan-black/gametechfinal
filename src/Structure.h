@@ -15,6 +15,10 @@ namespace godot {
 
 	public:
 
+		enum class Type {
+			Wall, Ramp, Floor
+		};
+
         static void _register_methods();
 
 		Structure();
@@ -25,8 +29,12 @@ namespace godot {
 		void _process(float delta);
         void _take_damage(float damage);
 		void _ready();
+		void _set_type(Type type);
+		Type _get_type();
 
 	private:
+		Type type = Type::Wall;
+
 	};
 
 }

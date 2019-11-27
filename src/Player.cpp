@@ -167,7 +167,7 @@ void Player::_build(Player::Action action) {
 
     ray->set_enabled(true);
 
-    ray->set_cast_to(Vector3(0,0,-5));
+    ray->set_cast_to(Vector3(0,0,-10));
     ray->force_raycast_update();
 
     if (ray->is_colliding()) {
@@ -232,9 +232,7 @@ void Player::_build_in_grid_block(GridBlock* gridBlock, Action action) {
         gridBlock->_add_wall(direction);
         break;
     case Action::Build_Floor:
-        if (!gridBlock->_add_floor()) {
-            gridBlock->_add_ceiling();
-        }
+        gridBlock->_add_floor();
         break;
     default:
         break;
