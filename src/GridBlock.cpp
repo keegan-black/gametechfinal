@@ -407,5 +407,50 @@ Structure* GridBlock::_has_front_wall() {
     return structure;
 }
 
+GridBlock::Direction GridBlock::_face_at_global_point(Vector3 location) {
+    Vector3 curr_location = this->get_global_transform().get_origin();
+    Vector3 relative_location = location - curr_location;
+    Godot::print("Current Location");
+    Godot::print(curr_location);
+    Godot::print("Relative Location");
+    Godot::print(relative_location);
+
+    int x,y,z;
+    x = (int) relative_location.x;
+    y = (int) relative_location.y;
+    z = (int) relative_location.z;
+
+    std::cout << x <<  " " << y << " " << z << std::endl;
+
+    if (z >= 3 && abs(x) < 3 && abs(y) < 3) {
+        Godot::print("Direction::Back");
+        return Direction::Back;
+    }
+    if (z <= 3 && abs(x) < 3 && abs(y) < 3) {
+        Godot::print("Direction::Front");
+        return Direction::Front;
+    }
+    if (x >= 3 && abs(z) < 3 && abs(y) < 3) {
+        Godot::print("Direction::Right");
+        return Direction::Right;
+    }
+    if (x <= 3 && abs(z) < 3 && abs(y) < 3) {
+        Godot::print("Direction::Left");
+        return Direction::Left;
+    }
+    if (y >= 3 && abs(z) < 3 && abs(x) < 3) {
+        Godot::print("Direction::Top");
+        return Direction::Top;
+    }
+    if (y <= 3 && abs(z) < 3 && abs(x) < 3) {
+        Godot::print("Direction::Bottom");
+        return Direction::Bottom;
+    }
+
+
+    return Direction::Front;
+
+}
+
 void GridBlock::_process(float delta) {
 }

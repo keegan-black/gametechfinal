@@ -184,7 +184,7 @@ void Player::_build(Player::Action action) {
         } else if (area != nullptr) {
             GridBlock* gridBlock = Node::cast_to<GridBlock>(area->get_parent());
             if (gridBlock != nullptr) {
-                _build_in_grid_block(gridBlock, action);
+                _build_in_grid_block(gridBlock, action, ray->get_collision_point());
             }
         }
     }
@@ -211,10 +211,10 @@ void Player::_create_grid_block_at(Vector3 floor_location, Action action) {
 
     get_tree()->get_root()->add_child(gridBlock);
     gridBlock->set_global_transform(Transform(gridBlock->get_global_transform().basis,new_location));
-    _build_in_grid_block(gridBlock, action);
+    _build_in_grid_block(gridBlock, action, Vector3(0,0,0));
 }
 
-void Player::_build_in_grid_block(GridBlock* gridBlock, Action action) {
+void Player::_build_in_grid_block(GridBlock* gridBlock, Action action, Vector3 collision_location) {
 
     GridBlock::Direction direction = GridBlock::Direction::Front;
     float rot = _get_grid_rotation();
@@ -222,6 +222,8 @@ void Player::_build_in_grid_block(GridBlock* gridBlock, Action action) {
     if (rot == 90.0f) { direction = GridBlock::Direction::Left;}
     if (rot == 180.0f) { direction = GridBlock::Direction::Back;}
     if (rot == 270.0f) { direction = GridBlock::Direction::Right;}
+
+    gridBlock->_face_at_global_point(collision_location);
 
     switch (action)
     {

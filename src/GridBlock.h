@@ -17,7 +17,7 @@ namespace godot {
 
 
         enum class Direction {
-            Front, Back, Left, Right
+            Front, Back, Left, Right, Top, Bottom
         };
 
         static void _register_methods();
@@ -46,6 +46,8 @@ namespace godot {
         bool _add_floor();
         bool _add_ceiling();
         void _check_neighbors();
+
+        Direction _face_at_global_point(Vector3 location);
 
 	private:
         

@@ -84,7 +84,7 @@ namespace godot {
 		void _shoot();
 		void _build(Action action);
 		void _create_grid_block_at(Vector3 floor_location, Action action);
-		void _build_in_grid_block(GridBlock* gridBlock, Action action);
+		void _build_in_grid_block(GridBlock* gridBlock, Action action, Vector3 collision_location);
 		void handle_gravity(Vector3& force, Vector3& gravity);
 		void handle_movement(Vector3& force, FrontDirection front_direction, SideDirection side_direction);
 		void handle_move_action(Vector3& force, MovementAction move_action);
