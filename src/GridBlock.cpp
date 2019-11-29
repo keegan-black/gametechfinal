@@ -420,8 +420,6 @@ GridBlock::Direction GridBlock::_face_at_global_point(Vector3 location) {
     y = (int) relative_location.y;
     z = (int) relative_location.z;
 
-    std::cout << x <<  " " << y << " " << z << std::endl;
-
     if (z >= 3 && abs(x) < 3 && abs(y) < 3) {
         Godot::print("Direction::Back");
         return Direction::Back;

@@ -182,10 +182,10 @@ Player::Facing Player::_get_facing_with_tilt() {
     if (tilt != 0) {
         if (tilt == -90) { return Facing::Down;}
         if (tilt == 90) { return Facing::Up;}
+        return Facing::Down;
     } else {
         return _get_facing_no_tilt();
     }
-
 }
 Player::Facing Player::_get_facing_no_tilt() {
     float rotation = _get_grid_rotation();
@@ -195,6 +195,8 @@ Player::Facing Player::_get_facing_no_tilt() {
     if (rotation == 90.0F) { return Facing::Left;}
     if (rotation == 180.0F) { return Facing::Back;}
     if (rotation == 270.0F) { return Facing::Right;}
+
+    return Facing::Front;
 
 }
 
@@ -273,10 +275,14 @@ void Player::_build_click_on_gridblock(GridBlock* gridBlock, BuildType buildType
         gridBlock->_add_ramp(user_direction);
         break;
     case BuildType::Floor:
-        if (gridBlock->_has_floor()) {
+        if (gridBlock_direction == GridBlock::Direction::Top) {
             gridBlock->_add_ceiling();
         } else {
-            gridBlock->_add_floor();
+            if (gridBlock->_has_floor()) {
+                gridBlock->_add_ceiling();
+            } else {
+                gridBlock->_add_floor();
+            }
         }
         break;
     default:
@@ -328,6 +334,8 @@ void Player::_build_click_on_structure(BuildType BuildType, Vector3 collision_po
 
 GridBlock* Player::_create_grid_block_at(Vector3 floor_location) {
     Vector3 new_location = _to_grid_coordinate(floor_location);
+    Godot::print("Built New Grid Block at");
+    Godot::print(new_location);
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
 
     if (resourceLoader == nullptr) {
