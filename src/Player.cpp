@@ -94,6 +94,8 @@ void Player::_physics_process(float delta) {
     }
 
     Action action = Action::None;
+    BuildType buildType = BuildType::None;
+
     if (input->is_key_pressed(84)) { // T
         if (!is_shooting) {
             is_shooting = true;
@@ -106,34 +108,37 @@ void Player::_physics_process(float delta) {
     if (input->is_key_pressed(82)) { // R
         if (!is_building) {
             is_building = true;
-            action = Action::Build_Wall;
+            action = Action::Build;
+            buildType = BuildType::Wall;
         }  
     } else if(input->is_key_pressed(70)) { // F
         if (!is_building) {
             is_building = true;
-            action = Action::Build_Ramp;
+            action = Action::Build;
+            buildType = BuildType::Ramp;
         }  
     } else if(input->is_key_pressed(69)) { // E
         if (!is_building) {
             is_building = true;
-            action = Action::Build_Floor;
+            action = Action::Build;
+            buildType = BuildType::Floor;
         }  
     } else {
         is_building = false;
     }
 
-    _perform_action(action);
+    _perform_action(action, buildType);
     _move(front_direction, side_direction, move_action);
 	
 	
 }
 
-void Player::_perform_action(Player::Action action) {
+void Player::_perform_action(Player::Action action, Player::BuildType buildType) {
     if (action == Action::Shoot) {
         _shoot();
     }
-    if (action == Action::Build_Wall || action == Action::Build_Ramp || action == Action::Build_Floor) {
-        _build(action);
+    if (action == Action::Build || buildType != BuildType::None) {
+        _build(buildType);
     }
 }
 
@@ -156,7 +161,44 @@ float Player::_get_grid_rotation() {
     return 0;
 }
 
-void Player::_build(Player::Action action) {
+float Player::_get_grid_tilt() {
+    float angle = camera_angle;
+    if (angle > -30 && angle < 30) {
+        return 0;
+    }
+    if (angle < -30) {
+        return -90;
+    }
+    if (angle > 30) {
+        return 90;
+    }
+    return 0;
+}
+
+Player::Facing Player::_get_facing_with_tilt() {
+    float rotation = _get_grid_rotation();
+    float tilt = _get_grid_tilt();
+
+    if (tilt != 0) {
+        if (tilt == -90) { return Facing::Down;}
+        if (tilt == 90) { return Facing::Up;}
+    } else {
+        return _get_facing_no_tilt();
+    }
+
+}
+Player::Facing Player::_get_facing_no_tilt() {
+    float rotation = _get_grid_rotation();
+    float tilt = _get_grid_tilt();
+
+    if (rotation == 0.0F) { return Facing::Front;}
+    if (rotation == 90.0F) { return Facing::Left;}
+    if (rotation == 180.0F) { return Facing::Back;}
+    if (rotation == 270.0F) { return Facing::Right;}
+
+}
+
+void Player::_build(Player::BuildType buildType) {
     if (ray == nullptr) {
         Godot::print("Ray not found");
         return;
@@ -179,12 +221,19 @@ void Player::_build(Player::Action action) {
         Area* area = Object::cast_to<Area>(obj);
         if (body != nullptr) {
             if (body->get_name() == "FloorStaticBody") {
-                _create_grid_block_at(ray->get_collision_point(), action);
+                // _create_grid_block_at(ray->get_collision_point());
+                _build_click_on_floor(buildType, ray->get_collision_point());
+            } else {
+                Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
+                if (structure != nullptr) {
+                    _build_click_on_structure(buildType, ray->get_collision_point());
+                }
             }
         } else if (area != nullptr) {
             GridBlock* gridBlock = Node::cast_to<GridBlock>(area->get_parent());
             if (gridBlock != nullptr) {
-                _build_in_grid_block(gridBlock, action, ray->get_collision_point());
+                _build_click_on_gridblock(gridBlock, buildType, ray->get_collision_point());
+                // _build_in_grid_block(gridBlock, buildType, ray->get_collision_point());
             }
         }
     }
@@ -192,13 +241,98 @@ void Player::_build(Player::Action action) {
     ray->set_enabled(false);
 }
 
-void Player::_create_grid_block_at(Vector3 floor_location, Action action) {
+void Player::_build_click_on_gridblock(GridBlock* gridBlock, BuildType buildType, Vector3 collision_point) {
+    Facing facing = _get_facing_no_tilt();
+    GridBlock::Direction user_direction = GridBlock::Direction::Front;
+    switch (facing)
+    {
+    case Facing::Front:
+        user_direction = GridBlock::Direction::Front;
+        break;
+    case Facing::Back:
+        user_direction = GridBlock::Direction::Back;
+        break;
+    case Facing::Left:
+        user_direction = GridBlock::Direction::Left;
+        break;
+    case Facing::Right:
+        user_direction = GridBlock::Direction::Right;
+        break;
+    default:
+        break;
+    }
+
+    GridBlock::Direction gridBlock_direction = gridBlock->_face_at_global_point(collision_point);
+
+    switch (buildType)
+    {
+    case BuildType::Wall:
+        gridBlock->_add_wall(gridBlock_direction);
+        break;
+    case BuildType::Ramp:
+        gridBlock->_add_ramp(user_direction);
+        break;
+    case BuildType::Floor:
+        if (gridBlock->_has_floor()) {
+            gridBlock->_add_ceiling();
+        } else {
+            gridBlock->_add_floor();
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+Vector3 Player::_get_nearest_neighbor_gridBlock_from(Vector3 location) {
+    Facing facing = _get_facing_with_tilt();
+    Vector3 next_door_block = location;
+    switch (facing)
+    {
+    case Facing::Front:
+        next_door_block.z += 3;
+        break;
+    case Facing::Back:
+        next_door_block.z -= 3;
+        break;
+    case Facing::Left:
+        next_door_block.x += 3;
+        break;
+    case Facing::Right:
+        next_door_block.z -= 3;
+        break;
+    case Facing::Up:
+        next_door_block.y -= 3;
+        break;
+    case Facing::Down:
+        next_door_block.y += 3;
+        break;
+    default:
+        break;
+    }
+
+    return next_door_block;
+}
+
+void Player::_build_click_on_floor(BuildType buildType, Vector3 collision_point) {
+    GridBlock* block = _create_grid_block_at(collision_point);
+    _build_in_grid_block(block, buildType);
+}
+
+void Player::_build_click_on_structure(BuildType BuildType, Vector3 collision_point) {
+    Vector3 nearest_neighbor = _get_nearest_neighbor_gridBlock_from(collision_point);
+    GridBlock* block = _create_grid_block_at(nearest_neighbor);
+    _build_in_grid_block(block, BuildType);
+}
+
+
+GridBlock* Player::_create_grid_block_at(Vector3 floor_location) {
     Vector3 new_location = _to_grid_coordinate(floor_location);
     ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
 
     if (resourceLoader == nullptr) {
         Godot::print("[ERROR] Resource Loader Null");
-        return;
+        return nullptr;
     }
 
     Ref<PackedScene> gridScene = resourceLoader->load("res://GridBlock.tscn");
@@ -206,15 +340,16 @@ void Player::_create_grid_block_at(Vector3 floor_location, Action action) {
 
     if (gridBlock == nullptr) {
         Godot::print("[ERROR] Gridblock is null");
-        return;
+        return nullptr;
     }
 
     get_tree()->get_root()->add_child(gridBlock);
     gridBlock->set_global_transform(Transform(gridBlock->get_global_transform().basis,new_location));
-    _build_in_grid_block(gridBlock, action, Vector3(0,0,0));
+    //_build_in_grid_block(gridBlock, action, Vector3(0,0,0));
+    return gridBlock;
 }
 
-void Player::_build_in_grid_block(GridBlock* gridBlock, Action action, Vector3 collision_location) {
+void Player::_build_in_grid_block(GridBlock* gridBlock, BuildType buildType) {
 
     GridBlock::Direction direction = GridBlock::Direction::Front;
     float rot = _get_grid_rotation();
@@ -223,17 +358,15 @@ void Player::_build_in_grid_block(GridBlock* gridBlock, Action action, Vector3 c
     if (rot == 180.0f) { direction = GridBlock::Direction::Back;}
     if (rot == 270.0f) { direction = GridBlock::Direction::Right;}
 
-    gridBlock->_face_at_global_point(collision_location);
-
-    switch (action)
+    switch (buildType)
     {
-    case Action::Build_Ramp:
+    case BuildType::Ramp:
         gridBlock->_add_ramp(direction);
         break;
-    case Action::Build_Wall:
+    case BuildType::Wall:
         gridBlock->_add_wall(direction);
         break;
-    case Action::Build_Floor:
+    case BuildType::Floor:
         gridBlock->_add_floor();
         break;
     default:

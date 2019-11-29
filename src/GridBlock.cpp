@@ -410,10 +410,10 @@ Structure* GridBlock::_has_front_wall() {
 GridBlock::Direction GridBlock::_face_at_global_point(Vector3 location) {
     Vector3 curr_location = this->get_global_transform().get_origin();
     Vector3 relative_location = location - curr_location;
-    Godot::print("Current Location");
-    Godot::print(curr_location);
-    Godot::print("Relative Location");
-    Godot::print(relative_location);
+    // Godot::print("Current Location");
+    // Godot::print(curr_location);
+    // Godot::print("Relative Location");
+    // Godot::print(relative_location);
 
     int x,y,z;
     x = (int) relative_location.x;

@@ -25,10 +25,10 @@ namespace godot {
 		
 		Vector3 velocity;
 
-		float camera_angle = 0;
+		float camera_angle = 0; //Degrees
 		float mouse_x_sensitivity = 0.3;
 		float mouse_y_sensitivity = 0.3;
-		float rotation = 0;
+		float rotation = 0; //Radians
 
 		float max_walk_angle = 0.75;
 
@@ -48,7 +48,20 @@ namespace godot {
         };
 
 		enum class Action {
-			None, Shoot, Build_Wall, Build_Ramp, Build_Floor
+			None, Shoot, Build
+		};
+
+		enum class BuildType {
+			None, Wall, Ramp, Floor
+		};
+
+		enum class Facing {
+			Front, 	// -z
+			Back,	// z
+			Left,	// -x
+			Right,	// x
+			Up,	// y
+			Down	// -y
 		};
 
 		KinematicBody* me;
@@ -75,16 +88,28 @@ namespace godot {
 		void _physics_process(float delta);
 		void _input(InputEvent *event);
         void _move(FrontDirection front_direction, SideDirection side_direction, MovementAction action);
-		void _perform_action(Action action);
+		void _perform_action(Action action, BuildType buildType);
 		void _ready();
 
 	private:
 
 		float _get_grid_rotation();
+		float _get_grid_tilt();
+
+		Vector3 _get_nearest_neighbor_gridBlock_from(Vector3 location);
+		Facing _get_facing_with_tilt();
+		Facing _get_facing_no_tilt();
+
 		void _shoot();
-		void _build(Action action);
-		void _create_grid_block_at(Vector3 floor_location, Action action);
-		void _build_in_grid_block(GridBlock* gridBlock, Action action, Vector3 collision_location);
+		void _build(BuildType buildType);
+
+		void _build_click_on_gridblock(GridBlock* gridBlock, BuildType buildType, Vector3 collision_point);
+		void _build_click_on_floor(BuildType buildType, Vector3 collision_point);
+		void _build_click_on_structure(BuildType BuildType, Vector3 collision_point);
+
+		GridBlock* _create_grid_block_at(Vector3 floor_location);
+		void _build_in_grid_block(GridBlock* gridBlock, BuildType buildType);
+
 		void handle_gravity(Vector3& force, Vector3& gravity);
 		void handle_movement(Vector3& force, FrontDirection front_direction, SideDirection side_direction);
 		void handle_move_action(Vector3& force, MovementAction move_action);
