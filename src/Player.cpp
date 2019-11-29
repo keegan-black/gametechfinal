@@ -163,13 +163,13 @@ float Player::_get_grid_rotation() {
 
 float Player::_get_grid_tilt() {
     float angle = camera_angle;
-    if (angle > -30 && angle < 30) {
+    if (angle > -45 && angle < 45) {
         return 0;
     }
-    if (angle < -30) {
+    if (angle < -45) {
         return -90;
     }
-    if (angle > 30) {
+    if (angle > 45) {
         return 90;
     }
     return 0;
@@ -228,7 +228,7 @@ void Player::_build(Player::BuildType buildType) {
             } else {
                 Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
                 if (structure != nullptr) {
-                    _build_click_on_structure(buildType, ray->get_collision_point());
+                    _build_click_on_structure(buildType, ray->get_collision_point(), structure);
                 }
             }
         } else if (area != nullptr) {
@@ -325,10 +325,34 @@ void Player::_build_click_on_floor(BuildType buildType, Vector3 collision_point)
     _build_in_grid_block(block, buildType);
 }
 
-void Player::_build_click_on_structure(BuildType BuildType, Vector3 collision_point) {
+void Player::_build_click_on_structure(BuildType buildType, Vector3 collision_point, Structure* structure) {
+
     Vector3 nearest_neighbor = _get_nearest_neighbor_gridBlock_from(collision_point);
     GridBlock* block = _create_grid_block_at(nearest_neighbor);
-    _build_in_grid_block(block, BuildType);
+    if (buildType == BuildType::Wall && structure->_get_type() == Structure::Type::Wall) {
+        Structure::Orientation orientation = structure->_get_orientation();
+        Facing f = Facing::Front;
+        switch (orientation)
+        {
+        case Structure::Orientation::Front:
+            f = Facing::Front;
+            break;
+        case Structure::Orientation::Back:
+            f = Facing::Back;
+            break;
+        case Structure::Orientation::Left:
+            f = Facing::Left;
+            break;
+        case Structure::Orientation::Right:
+            f = Facing::Right;
+            break;
+        default:
+            break;
+        }
+        _build_in_grid_block(block, buildType, f);
+    } else {
+        _build_in_grid_block(block, buildType);
+    }
 }
 
 
@@ -357,14 +381,30 @@ GridBlock* Player::_create_grid_block_at(Vector3 floor_location) {
     return gridBlock;
 }
 
-void Player::_build_in_grid_block(GridBlock* gridBlock, BuildType buildType) {
+void Player::_build_in_grid_block(GridBlock* gridBlock, BuildType buildType, Facing facing) {
 
     GridBlock::Direction direction = GridBlock::Direction::Front;
-    float rot = _get_grid_rotation();
-    if (rot == 0.0f) { direction = GridBlock::Direction::Front;}
-    if (rot == 90.0f) { direction = GridBlock::Direction::Left;}
-    if (rot == 180.0f) { direction = GridBlock::Direction::Back;}
-    if (rot == 270.0f) { direction = GridBlock::Direction::Right;}
+
+    if (facing == Facing::None) {
+        facing = _get_facing_no_tilt();
+    }
+    switch (facing)
+    {
+    case Facing::Front:
+        direction = GridBlock::Direction::Front;
+        break;
+    case Facing::Back:
+        direction = GridBlock::Direction::Back;
+        break;
+    case Facing::Left:
+        direction = GridBlock::Direction::Left;
+        break;
+    case Facing::Right:
+        direction = GridBlock::Direction::Right;
+        break;
+    default:
+        break;
+    }
 
     switch (buildType)
     {

@@ -19,6 +19,10 @@ namespace godot {
 			Wall, Ramp, Floor
 		};
 
+		enum class Orientation {
+			Front, Back, Left, Right
+		};
+
         static void _register_methods();
 
 		Structure();
@@ -30,10 +34,13 @@ namespace godot {
         void _take_damage(float damage);
 		void _ready();
 		void _set_type(Type type);
+		void _set_orientation(Orientation orientation);
 		Type _get_type();
+		Orientation _get_orientation();
 
 	private:
 		Type type = Type::Wall;
+		Orientation orientation = Orientation::Front;
 
 	};
 

@@ -39,6 +39,14 @@ void Structure::_set_type(Type type) {
     this->type = type;
 }
 
+void Structure::_set_orientation(Orientation orientation) {
+    this->orientation = orientation;
+}
+
+Structure::Orientation Structure::_get_orientation() {
+    return this->orientation;
+}
+
 Structure::Type Structure::_get_type() {
     return this->type;
 }

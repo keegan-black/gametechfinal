@@ -76,15 +76,19 @@ bool GridBlock::_add_wall(Direction type) {
     switch (type)
     {
     case Direction::Front:
+        wall->_set_orientation(Structure::Orientation::Front);
         rot = 0;
         break;
     case Direction::Back:
+        wall->_set_orientation(Structure::Orientation::Back);
         rot = 180 * PI/180;
         break;
     case Direction::Left:
+        wall->_set_orientation(Structure::Orientation::Left);
         rot = 90 * PI/180;
         break;
     case Direction::Right:
+        wall->_set_orientation(Structure::Orientation::Right);
         rot = 270 * PI/180;
         break;
     
