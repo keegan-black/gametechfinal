@@ -48,7 +48,7 @@ namespace godot {
         };
 
 		enum class Action {
-			None, Shoot, Build
+			None, Shoot, Build, Melee
 		};
 
 		enum class BuildType {
@@ -76,6 +76,7 @@ namespace godot {
 		Vector3 terminal_velocity = Vector3(10,10,10);
 
 		bool is_shooting = false;
+		bool is_hitting = false;
 		bool is_building = false;
 
 		static void _register_methods();
@@ -102,6 +103,8 @@ namespace godot {
 		Facing _get_facing_no_tilt();
 
 		void _shoot();
+		void _melee();
+
 		void _build(BuildType buildType);
 
 		void _build_click_on_gridblock(GridBlock* gridBlock, BuildType buildType, Vector3 collision_point);

@@ -105,6 +105,15 @@ void Player::_physics_process(float delta) {
         is_shooting = false;
     }
 
+    if (input->is_key_pressed(67)) {
+        if (!is_hitting) {
+            is_hitting = true;
+            action = Action::Melee;
+        }
+    } else {
+        is_hitting = false;
+    }
+
     if (input->is_key_pressed(82)) { // R
         if (!is_building) {
             is_building = true;
@@ -136,6 +145,9 @@ void Player::_physics_process(float delta) {
 void Player::_perform_action(Player::Action action, Player::BuildType buildType) {
     if (action == Action::Shoot) {
         _shoot();
+    }
+    if (action == Action::Melee) {
+        _melee();
     }
     if (action == Action::Build || buildType != BuildType::None) {
         _build(buildType);
@@ -449,6 +461,34 @@ void Player::_shoot() {
 
     ray->set_enabled(false);
 
+}
+
+void Player::_melee() {
+    if (ray == nullptr) {
+        Godot::print("Ray not found");
+        return;
+    }
+
+    ray->set_collide_with_areas(false);
+    ray->set_collide_with_bodies(true);
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(0,0,-2));
+    ray->force_raycast_update();
+
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        if (body != nullptr) {
+            Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
+            if (structure != nullptr) {
+                structure->_take_damage(100);
+            }
+        } 
+    }
+
+    ray->set_enabled(false);
 }
 
 void Player::_move(Player::FrontDirection front_direction, Player::SideDirection side_direction, Player::MovementAction move_action) {
