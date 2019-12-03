@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Structure.h"
+#include "Zombie.h"
 #include <KinematicCollision.hpp>
 #include <SceneTree.hpp>
 #include <ResourceLoader.hpp>
@@ -457,6 +458,13 @@ void Player::_shoot() {
                 structure->_take_damage(20);
             }
         } 
+        KinematicBody* kin = Object::cast_to<KinematicBody>(obj);
+        if (kin != nullptr) {
+            Zombie* zombie = Node::cast_to<Zombie>(kin->get_parent());
+            if (zombie != nullptr) {
+                zombie->_take_damage(20);
+            }
+        }
     }
 
     ray->set_enabled(false);
@@ -486,6 +494,13 @@ void Player::_melee() {
                 structure->_take_damage(100);
             }
         } 
+        KinematicBody* kin = Object::cast_to<KinematicBody>(obj);
+        if (kin != nullptr) {
+            Zombie* zombie = Node::cast_to<Zombie>(kin->get_parent());
+            if (zombie != nullptr) {
+                zombie->_take_damage(20);
+            }
+        }
     }
 
     ray->set_enabled(false);
