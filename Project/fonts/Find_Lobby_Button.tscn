@@ -21,5 +21,5 @@ custom_fonts/font = ExtResource( 1 )
 custom_colors/font_color_shadow = Color( 1, 0.67451, 0.258824, 1 )
 custom_constants/shadow_offset_x = 5
 custom_constants/shadow_offset_y = 5
-text = "FIND LOBBY"
+text = "START GAME"
 align = 1

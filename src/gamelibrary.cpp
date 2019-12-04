@@ -3,6 +3,7 @@
 #include "Structure.h"
 #include "GridBlock.h"
 #include "Zombie.h"
+#include "GameController.h"
 
 extern "C" void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *o) {
     godot::Godot::gdnative_init(o);
@@ -19,4 +20,5 @@ extern "C" void GDN_EXPORT godot_nativescript_init(void *handle) {
    godot::register_class<godot::Structure>();
    godot::register_class<godot::GridBlock>();
    godot::register_class<godot::Zombie>();
+   godot::register_class<godot::GameController>();
 }
