@@ -54,7 +54,16 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 6, -29 )
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 6, -24 )
 
 [node name="Zombie" parent="." instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 55, 12, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 55, 12, -23 )
+
+[node name="Zombie2" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 12, -7 )
+
+[node name="Zombie3" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 57, 12, 11 )
+
+[node name="Zombie4" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 71, 12, 29 )
 
 [node name="Player" parent="." instance=ExtResource( 3 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -61, 12, 0 )
@@ -65,8 +74,8 @@ shadow_enabled = true
 
 [node name="Control" parent="." instance=ExtResource( 4 )]
 
-[node name="Tower" parent="." instance=ExtResource( 5 )]
+[node name="PlayerTower" parent="." instance=ExtResource( 5 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -84, 0, 0 )
 
-[node name="Tower2" parent="." instance=ExtResource( 5 )]
+[node name="ZombieTower" parent="." instance=ExtResource( 5 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 76, 0, 0 )

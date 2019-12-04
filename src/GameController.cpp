@@ -19,6 +19,8 @@ void GameController::_init() {
 }
 
 void GameController::_ready(){
+	playerTower = Node::cast_to<Tower>(get_node("/root/Spatial/PlayerTower"));
+	zombieTower = Node::cast_to<Tower>(get_node("/root/Spatial/ZombieTower"));
 }
 
 void GameController::_process(float delta) {

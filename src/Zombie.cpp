@@ -1,4 +1,5 @@
 #include "Zombie.h"
+#include "GameController.h"
 
 using namespace godot;
 
@@ -32,7 +33,6 @@ void Zombie::_init() {
 }
 
 void Zombie::_ready(){
-
     me = Object::cast_to<KinematicBody>(get_node("KinematicBody"));
 }
 
@@ -77,13 +77,14 @@ void Zombie::handle_movement(Vector3& force) {
 
     Vector3 move_direction = (target-current_location).normalized();
 
-    Godot::print(move_direction);
-
     force += move_direction * Vector3(moveSpeed,0,moveSpeed);
 }
 
 void Zombie::_process(float delta) {
-    
+    GameController* gameController = Node::cast_to<GameController>(get_node("/root/GameController"));
+    if (gameController != nullptr && gameController->playerTower != nullptr) {
+        target = gameController->playerTower->get_global_transform().get_origin();
+    }
 }
 
 void Zombie::_set_target(Vector3 target) {

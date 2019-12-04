@@ -3,6 +3,7 @@
 
 #include <Godot.hpp>
 #include <Area.hpp>
+#include "Tower.h"
 
 namespace godot {
 
@@ -11,12 +12,12 @@ namespace godot {
 
 	private:
     
-    static void _register_methods();
 
 	public:
+        static void _register_methods();
 
-        Vector3 playerTower;
-        Vector3 zombieTower;
+        Tower* playerTower = nullptr;
+        Tower* zombieTower = nullptr;
 
         int level = 0;
         
