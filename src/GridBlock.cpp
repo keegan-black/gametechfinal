@@ -62,6 +62,69 @@ void GridBlock::_check_neighbors() {
     }
 }
 
+bool GridBlock::_has_neighbor_block(Direction direction) {
+    RayCast* ray = Object::cast_to<RayCast>(get_node("RayCast"));
+    if (ray == nullptr) {
+        Godot::print("Couldn't find ray node");
+        return false;
+    }
+
+    Vector3 cast_location = Vector3(0,0,0);
+    switch (direction) 
+    {
+    case Direction::Front:
+        cast_location = Vector3(0,0,-6);
+        break;
+    case Direction::Back:
+        cast_location = Vector3(0,0,6);
+        break;
+    case Direction::Left:
+        cast_location = Vector3(-6,0,0);
+        break;
+    case Direction::Right:
+        cast_location = Vector3(6,0,0);
+        break;
+    case Direction::Top:
+        cast_location = Vector3(0,6,0);
+        break;
+    case Direction::Bottom:
+        cast_location = Vector3(0,-6,0);
+        break;
+    default:
+        break;
+    }
+
+    Godot::print("Checking Neighbor Block");
+
+    ray->set_collide_with_areas(true);
+    ray->set_collide_with_bodies(false);
+
+    GridBlock* gridBlock = nullptr;
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(cast_location);
+    ray->force_raycast_update();
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        Area* area = Object::cast_to<Area>(obj);
+        if (area != nullptr) {
+            Node* parent = area->get_parent();
+            if (parent != nullptr) {
+                gridBlock = Node::cast_to<GridBlock>(parent);
+            }
+        }
+    }
+
+    ray->set_enabled(false);
+
+    if (gridBlock == nullptr) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 bool GridBlock::_add_wall(Direction type) {
     if (_has_wall(type)) { 
         Godot::print("GridBlock: Wall Already Exists");

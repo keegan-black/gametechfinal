@@ -47,6 +47,8 @@ namespace godot {
         bool _add_ceiling();
         void _check_neighbors();
 
+        bool _has_neighbor_block(Direction direction);
+
         Direction _face_at_global_point(Vector3 location);
 
 	private:
