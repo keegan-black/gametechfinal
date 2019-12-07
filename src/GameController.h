@@ -4,6 +4,8 @@
 #include <Godot.hpp>
 #include <Area.hpp>
 #include "Tower.h"
+#include "Structure.h"
+#include "GridBlock.h"
 
 namespace godot {
 
@@ -11,7 +13,10 @@ namespace godot {
 		GODOT_CLASS(GameController, Node)
 
 	private:
-    
+        
+        using Graph = Dictionary;
+        Graph structures;
+        // Vector3 -> Gridblock
 
 	public:
         static void _register_methods();
@@ -30,9 +35,14 @@ namespace godot {
         void _process(float delta);
         void _ready();
 
-	private:
-        
-	};
+        bool _add_structure(Structure::Type type, GridBlock::Direction direction, Vector3 location);
+
+        private:
+        bool _add_structure_in_gridblock(Structure::Type type, GridBlock::Direction direction, GridBlock* gridBlock);
+        void _add_neighboring_grid_blocks_if_dont_exist(Vector3 location);
+        GridBlock* _build_grid_block_at(Vector3 location);
+        Vector3 _to_grid_coordinate(Vector3 location);
+        };
 
 }
 

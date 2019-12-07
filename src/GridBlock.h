@@ -17,7 +17,7 @@ namespace godot {
 
 
         enum class Direction {
-            Front, Back, Left, Right, Top, Bottom
+            Front, Back, Left, Right, Top, Bottom, None
         };
 
         static void _register_methods();

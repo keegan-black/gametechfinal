@@ -107,13 +107,13 @@ namespace godot {
 
 		void _build(BuildType buildType);
 
-		void _build_click_on_gridblock(GridBlock* gridBlock, BuildType buildType, Vector3 collision_point);
-		void _build_click_on_floor(BuildType buildType, Vector3 collision_point);
-		void _build_click_on_structure(BuildType BuildType, Vector3 collision_point, Structure* structure);
+		// void _build_click_on_gridblock(GridBlock* gridBlock, BuildType buildType, Vector3 collision_point);
+		// void _build_click_on_floor(BuildType buildType, Vector3 collision_point);
+		// void _build_click_on_structure(BuildType BuildType, Vector3 collision_point, Structure* structure);
 
-		GridBlock* _create_grid_block_at(Vector3 floor_location);
-		void _create_grid_blocks_around(GridBlock* gridBlock);
-		void _build_in_grid_block(GridBlock* gridBlock, BuildType buildType, Facing facing = Facing::None);
+		// GridBlock* _create_grid_block_at(Vector3 floor_location);
+		// void _create_grid_blocks_around(GridBlock* gridBlock);
+		// void _build_in_grid_block(GridBlock* gridBlock, BuildType buildType, Facing facing = Facing::None);
 
 		void handle_gravity(Vector3& force, Vector3& gravity);
 		void handle_movement(Vector3& force, FrontDirection front_direction, SideDirection side_direction);

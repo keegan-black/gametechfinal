@@ -9,6 +9,7 @@
 #include <StaticBody.hpp>
 #include <SceneTree.hpp>
 #include <Viewport.hpp>
+#include <GameController.h>
 
 using namespace godot;
 #define PI 3.14
@@ -214,6 +215,47 @@ Player::Facing Player::_get_facing_no_tilt() {
 }
 
 void Player::_build(Player::BuildType buildType) {
+    GameController* gameController = Node::cast_to<GameController>(get_node("/root/GameController"));
+    if (gameController == nullptr) {
+        Godot::print("[Error] Game Controller Null");
+        return;
+    }
+
+    Structure::Type type = Structure::Type::Wall;
+    switch (buildType) {
+    case BuildType::Wall:
+        type = Structure::Type::Wall;
+        break;
+    case BuildType::Floor:
+        type = Structure::Type::Floor;
+        break;
+    case BuildType::Ramp:
+        type = Structure::Type::Ramp;
+        break;
+    default:
+        break;
+    }
+
+    Facing facing = _get_facing_no_tilt();
+    GridBlock::Direction user_direction = GridBlock::Direction::Front;
+    switch (facing)
+    {
+    case Facing::Front:
+        user_direction = GridBlock::Direction::Front;
+        break;
+    case Facing::Back:
+        user_direction = GridBlock::Direction::Back;
+        break;
+    case Facing::Left:
+        user_direction = GridBlock::Direction::Left;
+        break;
+    case Facing::Right:
+        user_direction = GridBlock::Direction::Right;
+        break;
+    default:
+        break;
+    }
+
     if (ray == nullptr) {
         Godot::print("Ray not found");
         return;
@@ -236,86 +278,30 @@ void Player::_build(Player::BuildType buildType) {
         Area* area = Object::cast_to<Area>(obj);
         if (body != nullptr) {
             if (body->get_name() == "FloorStaticBody") {
-                // _create_grid_block_at(ray->get_collision_point());
-                _build_click_on_floor(buildType, ray->get_collision_point());
+                gameController->_add_structure(type,user_direction,ray->get_collision_point());
             } else {
                 Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
                 if (structure != nullptr) {
-                    _build_click_on_structure(buildType, ray->get_collision_point(), structure);
+                    // _build_click_on_structure(buildType, ray->get_collision_point(), structure);
+                    gameController->_add_structure(type,user_direction,ray->get_collision_point());
                 }
             }
         } else if (area != nullptr) {
             GridBlock* gridBlock = Node::cast_to<GridBlock>(area->get_parent());
             if (gridBlock != nullptr) {
-                _build_click_on_gridblock(gridBlock, buildType, ray->get_collision_point());
-                // _build_in_grid_block(gridBlock, buildType, ray->get_collision_point());
+                GridBlock::Direction face_direction = gridBlock->_face_at_global_point(ray->get_collision_point());
+                Vector3 gridBlock_location = gridBlock->get_global_transform().get_origin();
+                Vector3 build_location = gridBlock_location;
+                if (face_direction == GridBlock::Direction::Top) {
+                    build_location.y += 6;
+                }
+                gameController->_add_structure(type,user_direction,build_location);
+
             }
         }
     }
 
     ray->set_enabled(false);
-}
-
-void Player::_build_click_on_gridblock(GridBlock* gridBlock, BuildType buildType, Vector3 collision_point) {
-    Facing facing = _get_facing_no_tilt();
-    GridBlock::Direction user_direction = GridBlock::Direction::Front;
-    switch (facing)
-    {
-    case Facing::Front:
-        user_direction = GridBlock::Direction::Front;
-        break;
-    case Facing::Back:
-        user_direction = GridBlock::Direction::Back;
-        break;
-    case Facing::Left:
-        user_direction = GridBlock::Direction::Left;
-        break;
-    case Facing::Right:
-        user_direction = GridBlock::Direction::Right;
-        break;
-    default:
-        break;
-    }
-
-    GridBlock::Direction gridBlock_direction = gridBlock->_face_at_global_point(collision_point);
-    bool built = false;
-
-    switch (buildType)
-    {
-    case BuildType::Wall:
-        if (gridBlock->_add_wall(gridBlock_direction)) {
-            built = true;
-        }
-        break;
-    case BuildType::Ramp:
-        if(gridBlock->_add_ramp(user_direction)) {
-            built = true;
-        }
-        break;
-    case BuildType::Floor:
-        if (gridBlock_direction == GridBlock::Direction::Top) {
-            if (gridBlock->_add_ceiling()) {
-                built = true;
-            }
-        } else {
-            if (gridBlock->_has_floor()) {
-                if(gridBlock->_add_ceiling()) {
-                    built = true;
-                }
-            } else {
-                if(gridBlock->_add_floor()) {
-                    built = true;
-                }
-            }
-        }
-        break;
-    default:
-        break;
-    }
-    if (built) {
-        _create_grid_blocks_around(gridBlock);
-    }
-
 }
 
 Vector3 Player::_get_nearest_neighbor_gridBlock_from(Vector3 location) {
@@ -346,155 +332,6 @@ Vector3 Player::_get_nearest_neighbor_gridBlock_from(Vector3 location) {
     }
 
     return next_door_block;
-}
-
-void Player::_build_click_on_floor(BuildType buildType, Vector3 collision_point) {
-    GridBlock* block = _create_grid_block_at(collision_point);
-    _build_in_grid_block(block, buildType);
-}
-
-void Player::_build_click_on_structure(BuildType buildType, Vector3 collision_point, Structure* structure) {
-
-    Vector3 nearest_neighbor = _get_nearest_neighbor_gridBlock_from(collision_point);
-    GridBlock* block = _create_grid_block_at(nearest_neighbor);
-    if (buildType == BuildType::Wall && structure->_get_type() == Structure::Type::Wall) {
-        Structure::Orientation orientation = structure->_get_orientation();
-        Facing f = Facing::Front;
-        switch (orientation)
-        {
-        case Structure::Orientation::Front:
-            f = Facing::Front;
-            break;
-        case Structure::Orientation::Back:
-            f = Facing::Back;
-            break;
-        case Structure::Orientation::Left:
-            f = Facing::Left;
-            break;
-        case Structure::Orientation::Right:
-            f = Facing::Right;
-            break;
-        default:
-            break;
-        }
-        _build_in_grid_block(block, buildType, f);
-    } else {
-        _build_in_grid_block(block, buildType);
-    }
-}
-
-
-GridBlock* Player::_create_grid_block_at(Vector3 floor_location) {
-    Vector3 new_location = _to_grid_coordinate(floor_location);
-    Godot::print("Built New Grid Block at");
-    Godot::print(new_location);
-    ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
-
-    if (resourceLoader == nullptr) {
-        Godot::print("[ERROR] Resource Loader Null");
-        return nullptr;
-    }
-
-    Ref<PackedScene> gridScene = resourceLoader->load("res://GridBlock.tscn");
-    GridBlock* gridBlock = Node::cast_to<GridBlock>(gridScene->instance());
-
-    if (gridBlock == nullptr) {
-        Godot::print("[ERROR] Gridblock is null");
-        return nullptr;
-    }
-
-    get_tree()->get_root()->add_child(gridBlock);
-    gridBlock->set_global_transform(Transform(gridBlock->get_global_transform().basis,new_location));
-    // _create_grid_blocks_around(gridBlock);
-    //_build_in_grid_block(gridBlock, action, Vector3(0,0,0));
-    return gridBlock;
-}
-
-void Player::_create_grid_blocks_around(GridBlock* gridBlock) {
-    Vector3 location = _to_grid_coordinate(gridBlock->get_global_transform().get_origin());
-    ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
-
-    if (resourceLoader == nullptr) {
-        Godot::print("[ERROR] Resource Loader Null");
-        return;
-    }
-    Ref<PackedScene> gridScene = resourceLoader->load("res://GridBlock.tscn");
-
-    if (!gridBlock->_has_neighbor_block(GridBlock::Direction::Front)) {
-        GridBlock* block = Node::cast_to<GridBlock>(gridScene->instance());;
-        get_tree()->get_root()->add_child(block);
-        block->set_global_transform(Transform(gridBlock->get_global_transform().basis,location + Vector3(0,0,-6)));
-    }
-    if (!gridBlock->_has_neighbor_block(GridBlock::Direction::Back)) {
-        GridBlock* block = Node::cast_to<GridBlock>(gridScene->instance());;
-        get_tree()->get_root()->add_child(block);
-        block->set_global_transform(Transform(gridBlock->get_global_transform().basis,location + Vector3(0,0,6)));
-    }
-
-    if (!gridBlock->_has_neighbor_block(GridBlock::Direction::Left)) {
-        GridBlock* block = Node::cast_to<GridBlock>(gridScene->instance());;
-        get_tree()->get_root()->add_child(block);
-        block->set_global_transform(Transform(gridBlock->get_global_transform().basis,location + Vector3(-6,0,0)));
-    }
-
-    if (!gridBlock->_has_neighbor_block(GridBlock::Direction::Right)) {
-        GridBlock* block = Node::cast_to<GridBlock>(gridScene->instance());;
-        get_tree()->get_root()->add_child(block);
-        block->set_global_transform(Transform(gridBlock->get_global_transform().basis,location + Vector3(6,0,0)));
-    }
-    
-}
-
-void Player::_build_in_grid_block(GridBlock* gridBlock, BuildType buildType, Facing facing) {
-
-    GridBlock::Direction direction = GridBlock::Direction::Front;
-
-    if (facing == Facing::None) {
-        facing = _get_facing_no_tilt();
-    }
-    switch (facing)
-    {
-    case Facing::Front:
-        direction = GridBlock::Direction::Front;
-        break;
-    case Facing::Back:
-        direction = GridBlock::Direction::Back;
-        break;
-    case Facing::Left:
-        direction = GridBlock::Direction::Left;
-        break;
-    case Facing::Right:
-        direction = GridBlock::Direction::Right;
-        break;
-    default:
-        break;
-    }
-    bool built = false;
-    switch (buildType)
-    {
-    case BuildType::Ramp:
-        if(gridBlock->_add_ramp(direction)) {
-            built = true;
-        }
-        break;
-    case BuildType::Wall:
-        if(gridBlock->_add_wall(direction)) {
-            built = true;
-        }
-        break;
-    case BuildType::Floor:
-        if (gridBlock->_add_floor()) {
-            built = true;
-        }
-        break;
-    default:
-        break;
-    }
-
-    if (built) {
-        _create_grid_blocks_around(gridBlock);
-    }
-
 }
 
 void Player::_shoot() {
