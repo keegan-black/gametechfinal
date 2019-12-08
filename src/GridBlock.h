@@ -13,6 +13,7 @@ namespace godot {
 	private:
 
 	public:
+        bool is_on_ground = false;
         Structure* ramp = nullptr;
 
 
@@ -40,6 +41,7 @@ namespace godot {
         Structure* _has_front_wall();
 
         bool _has_wall(Direction type);
+        bool is_empty();
 
         bool _add_wall(Direction type);
         bool _add_ramp(Direction direction);

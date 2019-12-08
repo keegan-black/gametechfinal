@@ -6,6 +6,7 @@
 #include <InputEventMouseMotion.hpp>
 #include <StaticBody.hpp>
 #include "GridBlock.h"
+#include "GameController.h"
 
 using namespace godot;
 #define PI 3.14
@@ -31,7 +32,19 @@ void Structure::_init() {
 void Structure::_take_damage(float damage) {
     health -= damage;
     if (health < 0) {
-        this->queue_free();
+        GridBlock* block = Node::cast_to<GridBlock>(get_parent());
+        Vector3 location = block->get_global_transform().get_origin();
+        GameController* gameController = Node::cast_to<GameController>(get_node("/root/GameController"));
+        
+        if (block != nullptr && type == Type::Ramp) {
+            block->ramp = nullptr;
+        }
+        get_parent()->remove_child(this);
+
+        if (gameController != nullptr) {
+            gameController->_check_gridblock_and_delete(location);
+        }
+        //this->queue_free();
     }
 }
 

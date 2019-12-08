@@ -278,12 +278,12 @@ void Player::_build(Player::BuildType buildType) {
         Area* area = Object::cast_to<Area>(obj);
         if (body != nullptr) {
             if (body->get_name() == "FloorStaticBody") {
-                gameController->_add_structure(type,user_direction,ray->get_collision_point());
+                gameController->_add_structure(type,user_direction,ray->get_collision_point(),true);
             } else {
                 Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
                 if (structure != nullptr) {
                     // _build_click_on_structure(buildType, ray->get_collision_point(), structure);
-                    gameController->_add_structure(type,user_direction,ray->get_collision_point());
+                    gameController->_add_structure(type,user_direction,ray->get_collision_point(),false);
                 }
             }
         } else if (area != nullptr) {
@@ -295,7 +295,7 @@ void Player::_build(Player::BuildType buildType) {
                 if (face_direction == GridBlock::Direction::Top) {
                     build_location.y += 6;
                 }
-                gameController->_add_structure(type,user_direction,build_location);
+                gameController->_add_structure(type,user_direction,build_location,false);
 
             }
         }
@@ -354,8 +354,10 @@ void Player::_shoot() {
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
+
                 structure->_take_damage(20);
             }
+            
         } 
         KinematicBody* kin = Object::cast_to<KinematicBody>(obj);
         if (kin != nullptr) {
@@ -390,6 +392,7 @@ void Player::_melee() {
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
+                Vector3 location = structure->get_global_transform().get_origin();
                 structure->_take_damage(100);
             }
         } 

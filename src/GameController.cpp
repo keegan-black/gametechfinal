@@ -31,20 +31,52 @@ void GameController::_ready(){
 void GameController::_process(float delta) {
 }
 
-bool GameController::_add_structure(Structure::Type type, GridBlock::Direction direction, Vector3 location) {
+bool GameController::_add_structure(Structure::Type type, GridBlock::Direction direction, Vector3 location,bool is_ground) {
 
 	GridBlock* gridBlock = Object::cast_to<GridBlock>(structures[location]);
 	if (gridBlock != nullptr) {
 		return _add_structure_in_gridblock(type, direction, gridBlock);
 	} else {
 		//Build GridBlock
-		GridBlock* new_gridBlock = _build_grid_block_at(location);
+		GridBlock* new_gridBlock = _build_grid_block_at(location,is_ground);
 		return _add_structure_in_gridblock(type, direction, new_gridBlock);
 	}
 
 	Godot::print("No GridBlock");
 
 	return false;
+}
+
+void GameController::_check_gridblock_and_delete(Vector3 location) {
+	Vector3 grid_location = _to_grid_coordinate(location);
+	GridBlock* gridBlock = Object::cast_to<GridBlock>(structures[grid_location]);
+	if (gridBlock != nullptr) {
+		if (gridBlock->is_empty()) {
+
+			structures.erase(grid_location);
+			gridBlock->get_parent()->remove_child(gridBlock);
+			//gridBlock->queue_free();
+			
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(GRID_SIZE,0,0));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(-GRID_SIZE,0,0));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(GRID_SIZE,GRID_SIZE,0));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(-GRID_SIZE,GRID_SIZE,0));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(GRID_SIZE,-GRID_SIZE,0));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(-GRID_SIZE,-GRID_SIZE,0));
+
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,GRID_SIZE,0));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,-GRID_SIZE,0));
+
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,0,GRID_SIZE));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,0,-GRID_SIZE));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,GRID_SIZE,GRID_SIZE));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,GRID_SIZE,-GRID_SIZE));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,-GRID_SIZE,GRID_SIZE));
+			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,-GRID_SIZE,-GRID_SIZE));
+		} else {
+			Godot::print("Not Empty");
+		}
+	}
 }
 
 bool GameController::_add_structure_in_gridblock(Structure::Type type, GridBlock::Direction direction, GridBlock* gridBlock) {
@@ -71,12 +103,12 @@ bool GameController::_add_structure_in_gridblock(Structure::Type type, GridBlock
 	}
 
 	if (built) {
-		_add_neighboring_grid_blocks_if_dont_exist(gridBlock->get_global_transform().get_origin());
+		_add_neighboring_grid_blocks_if_dont_exist(gridBlock->get_global_transform().get_origin(), gridBlock->is_on_ground);
 	}
 	return built;
 }
 
-GridBlock* GameController::_build_grid_block_at(Vector3 location) {
+GridBlock* GameController::_build_grid_block_at(Vector3 location, bool is_ground) {
 	GridBlock* check_block = Object::cast_to<GridBlock>(structures[location]);
 	if (check_block == nullptr) {
 		Vector3 new_location = _to_grid_coordinate(location);
@@ -99,6 +131,7 @@ GridBlock* GameController::_build_grid_block_at(Vector3 location) {
 
 		get_tree()->get_root()->add_child(new_gridBlock);
 		new_gridBlock->set_global_transform(Transform(new_gridBlock->get_global_transform().basis,new_location));
+		new_gridBlock->is_on_ground = is_ground;
 		structures[new_location] = new_gridBlock;
 
 		return new_gridBlock;
@@ -106,7 +139,7 @@ GridBlock* GameController::_build_grid_block_at(Vector3 location) {
 	return check_block;
 }
 
-void GameController::_add_neighboring_grid_blocks_if_dont_exist(Vector3 location) {
+void GameController::_add_neighboring_grid_blocks_if_dont_exist(Vector3 location, bool is_ground) {
 	Vector3 grid_location = _to_grid_coordinate(location);
 
 	Vector3 left = grid_location + Vector3(-GRID_SIZE,0,0);
@@ -114,10 +147,80 @@ void GameController::_add_neighboring_grid_blocks_if_dont_exist(Vector3 location
 	Vector3 front = grid_location + Vector3(0,0,-GRID_SIZE);
 	Vector3 back = grid_location + Vector3(0,0,GRID_SIZE);
 
-	_build_grid_block_at(left);
-	_build_grid_block_at(right);
-	_build_grid_block_at(front);
-	_build_grid_block_at(back);
+	_build_grid_block_at(left, is_ground);
+	_build_grid_block_at(right, is_ground);
+	_build_grid_block_at(front, is_ground);
+	_build_grid_block_at(back, is_ground);
+}
+
+bool GameController::_is_gridBlock_connected_to_floor_at(Vector3 location) {
+	Dictionary visited;
+	Godot::print("Start dfs");
+	Godot::print(location);
+	bool on_ground = _find_ground_dfs(location,visited);
+	if (!on_ground) {
+		Array arr = Array(visited.keys());
+		Godot::print("Trying to delete gridblocks");
+		for (int i = 0; i < arr.size(); i++) {
+			remove_gridBlock_at(arr[i]);
+    	} 
+	}
+	return on_ground;
+}
+
+bool GameController::_find_ground_dfs(Vector3 location, Dictionary& visited) { 
+	GridBlock* block = Object::cast_to<GridBlock>(structures[location]);
+	//bool* has_been_visited = Object::cast_to<bool>(visited[location]);
+	bool has_been_visited = static_cast<bool>(visited[location]);
+	if (block == nullptr || has_been_visited) {
+		// Godot::print("dfs::visited or null");
+		// Godot::print(location);
+		return false;
+	}
+
+	if(block->is_empty()) {
+		// Godot::print("dfs::block empty");
+		// Godot::print(location);
+		return false;
+	}
+
+	if (block->is_on_ground) {
+		Godot::print("dfs::block_on_ground");
+		// Godot::print(location);
+		return true;
+	}
+
+	visited[location] = true;
+
+	bool found = false;
+
+	found = found || _find_ground_dfs(location + Vector3(GRID_SIZE,0,0), visited);
+	found = found || _find_ground_dfs(location + Vector3(-GRID_SIZE,0,0), visited);
+	found = found || _find_ground_dfs(location + Vector3(GRID_SIZE,GRID_SIZE,0), visited);
+	found = found || _find_ground_dfs(location + Vector3(-GRID_SIZE,GRID_SIZE,0), visited);
+	found = found || _find_ground_dfs(location + Vector3(GRID_SIZE,-GRID_SIZE,0), visited);
+	found = found || _find_ground_dfs(location + Vector3(-GRID_SIZE,-GRID_SIZE,0), visited);
+
+	found = found || _find_ground_dfs(location + Vector3(0,GRID_SIZE,0), visited);
+	found = found || _find_ground_dfs(location + Vector3(0,-GRID_SIZE,0), visited);
+
+	found = found || _find_ground_dfs(location + Vector3(0,0,GRID_SIZE), visited);
+	found = found || _find_ground_dfs(location + Vector3(0,0,-GRID_SIZE), visited);
+	found = found || _find_ground_dfs(location + Vector3(0,GRID_SIZE,GRID_SIZE), visited);
+	found = found || _find_ground_dfs(location + Vector3(0,GRID_SIZE,-GRID_SIZE), visited);
+	found = found || _find_ground_dfs(location + Vector3(0,-GRID_SIZE,GRID_SIZE), visited);
+	found = found || _find_ground_dfs(location + Vector3(0,-GRID_SIZE,-GRID_SIZE), visited);
+
+	return found;
+}
+
+void GameController::remove_gridBlock_at(Vector3 location) {
+	GridBlock* block = Object::cast_to<GridBlock>(structures[location]);
+	structures.erase(location);
+	if (block != nullptr) {
+		block->queue_free();
+	}
+	
 }
 
 

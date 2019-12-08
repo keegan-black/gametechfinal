@@ -31,6 +31,18 @@ void GridBlock::_ready(){
     ramp = nullptr;
 }
 
+bool GridBlock::is_empty() {
+    bool not_empty = false;
+    not_empty = not_empty || _has_ramp();
+    not_empty = not_empty || _has_floor();
+    not_empty = not_empty || _has_back_wall();
+    not_empty = not_empty || _has_front_wall();
+    not_empty = not_empty || _has_right_wall();
+    not_empty = not_empty || _has_left_wall();
+
+    return !not_empty;
+}
+
 void GridBlock::_check_neighbors() {
 
     Godot::print("Checking Neighbors");
@@ -236,9 +248,6 @@ Structure* GridBlock::_has_floor() {
         Godot::print("Couldn't find ray node");
         return nullptr;
     }
-
-    Godot::print("Checking Floor");
-
     ray->set_collide_with_areas(false);
     ray->set_collide_with_bodies(true);
 
@@ -273,8 +282,6 @@ Structure* GridBlock::_has_ceiling() {
         Godot::print("Couldn't find ray node");
         return nullptr;
     }
-
-    Godot::print("Checking Ceiling");
 
     ray->set_collide_with_areas(false);
     ray->set_collide_with_bodies(true);
@@ -336,8 +343,6 @@ Structure* GridBlock::_has_left_wall() {
         return nullptr;
     }
 
-    Godot::print("Checking Left Wall");
-
     ray->set_collide_with_areas(false);
     ray->set_collide_with_bodies(true);
 
@@ -371,8 +376,6 @@ Structure* GridBlock::_has_right_wall() {
         Godot::print("Couldn't find ray node");
         return nullptr;
     }
-
-    Godot::print("Checking Right Wall");
 
     ray->set_collide_with_areas(false);
     ray->set_collide_with_bodies(true);
@@ -408,8 +411,6 @@ Structure* GridBlock::_has_back_wall() {
         return nullptr;
     }
 
-    Godot::print("Checking Back Wall");
-
     ray->set_collide_with_areas(false);
     ray->set_collide_with_bodies(true);
 
@@ -443,8 +444,6 @@ Structure* GridBlock::_has_front_wall() {
         Godot::print("Couldn't find ray node");
         return nullptr;
     }
-
-    Godot::print("Checking Front Wall");
 
     ray->set_collide_with_areas(false);
     ray->set_collide_with_bodies(true);

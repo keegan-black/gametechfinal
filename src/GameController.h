@@ -35,13 +35,20 @@ namespace godot {
         void _process(float delta);
         void _ready();
 
-        bool _add_structure(Structure::Type type, GridBlock::Direction direction, Vector3 location);
+        bool _add_structure(Structure::Type type, GridBlock::Direction direction, Vector3 location, bool is_ground = false);
+        void _check_gridblock_and_delete(Vector3 location);
 
         private:
         bool _add_structure_in_gridblock(Structure::Type type, GridBlock::Direction direction, GridBlock* gridBlock);
-        void _add_neighboring_grid_blocks_if_dont_exist(Vector3 location);
-        GridBlock* _build_grid_block_at(Vector3 location);
+        void _add_neighboring_grid_blocks_if_dont_exist(Vector3 location, bool is_ground);
+
+        bool _is_gridBlock_connected_to_floor_at(Vector3 location);
+
+        bool _find_ground_dfs(Vector3 location, Dictionary& visited);
+
+        GridBlock* _build_grid_block_at(Vector3 location, bool is_ground);
         Vector3 _to_grid_coordinate(Vector3 location);
+        void remove_gridBlock_at(Vector3 location);
         };
 
 }
