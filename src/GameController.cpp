@@ -73,8 +73,6 @@ void GameController::_check_gridblock_and_delete(Vector3 location) {
 			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,GRID_SIZE,-GRID_SIZE));
 			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,-GRID_SIZE,GRID_SIZE));
 			_is_gridBlock_connected_to_floor_at(grid_location + Vector3(0,-GRID_SIZE,-GRID_SIZE));
-		} else {
-			Godot::print("Not Empty");
 		}
 	}
 }
@@ -112,8 +110,6 @@ GridBlock* GameController::_build_grid_block_at(Vector3 location, bool is_ground
 	GridBlock* check_block = Object::cast_to<GridBlock>(structures[location]);
 	if (check_block == nullptr) {
 		Vector3 new_location = _to_grid_coordinate(location);
-		Godot::print("Build New Grid Block at");
-		Godot::print(new_location);
 		ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
 
 		if (resourceLoader == nullptr) {
@@ -155,12 +151,9 @@ void GameController::_add_neighboring_grid_blocks_if_dont_exist(Vector3 location
 
 bool GameController::_is_gridBlock_connected_to_floor_at(Vector3 location) {
 	Dictionary visited;
-	Godot::print("Start dfs");
-	Godot::print(location);
 	bool on_ground = _find_ground_dfs(location,visited);
 	if (!on_ground) {
 		Array arr = Array(visited.keys());
-		Godot::print("Trying to delete gridblocks");
 		for (int i = 0; i < arr.size(); i++) {
 			remove_gridBlock_at(arr[i]);
     	} 
@@ -173,20 +166,14 @@ bool GameController::_find_ground_dfs(Vector3 location, Dictionary& visited) {
 	//bool* has_been_visited = Object::cast_to<bool>(visited[location]);
 	bool has_been_visited = static_cast<bool>(visited[location]);
 	if (block == nullptr || has_been_visited) {
-		// Godot::print("dfs::visited or null");
-		// Godot::print(location);
 		return false;
 	}
 
 	if(block->is_empty()) {
-		// Godot::print("dfs::block empty");
-		// Godot::print(location);
 		return false;
 	}
 
 	if (block->is_on_ground) {
-		Godot::print("dfs::block_on_ground");
-		// Godot::print(location);
 		return true;
 	}
 

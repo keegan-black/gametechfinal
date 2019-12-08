@@ -44,34 +44,6 @@ bool GridBlock::is_empty() {
 }
 
 void GridBlock::_check_neighbors() {
-
-    Godot::print("Checking Neighbors");
-
-    Structure* n_front_wall = _has_front_wall();
-    Structure* n_back_wall = _has_back_wall();
-    Structure* n_left_wall = _has_left_wall();
-    Structure* n_right_wall = _has_right_wall();
-    Structure* n_ceiling = _has_ceiling();
-    Structure* n_floor = _has_floor();
-
-    if (n_front_wall != nullptr) {
-        Godot::print("Found front wall");
-    }
-    if (n_back_wall != nullptr) {
-        Godot::print("Found back wall");
-    }
-    if (n_left_wall != nullptr) {
-        Godot::print("Found left wall");
-    }
-    if (n_right_wall != nullptr) {
-        Godot::print("Found right wall");
-    }
-    if (n_ceiling != nullptr) {
-        Godot::print("Found ceiling");
-    }
-    if (n_floor != nullptr) {
-        Godot::print("Found floor");
-    }
 }
 
 bool GridBlock::_has_neighbor_block(Direction direction) {
@@ -105,8 +77,6 @@ bool GridBlock::_has_neighbor_block(Direction direction) {
     default:
         break;
     }
-
-    Godot::print("Checking Neighbor Block");
 
     ray->set_collide_with_areas(true);
     ray->set_collide_with_bodies(false);
@@ -487,27 +457,21 @@ GridBlock::Direction GridBlock::_face_at_global_point(Vector3 location) {
     z = (int) relative_location.z;
 
     if (z >= 3 && abs(x) < 3 && abs(y) < 3) {
-        Godot::print("Direction::Back");
         return Direction::Back;
     }
     if (z <= 3 && abs(x) < 3 && abs(y) < 3) {
-        Godot::print("Direction::Front");
         return Direction::Front;
     }
     if (x >= 3 && abs(z) < 3 && abs(y) < 3) {
-        Godot::print("Direction::Right");
         return Direction::Right;
     }
     if (x <= 3 && abs(z) < 3 && abs(y) < 3) {
-        Godot::print("Direction::Left");
         return Direction::Left;
     }
     if (y >= 3 && abs(z) < 3 && abs(x) < 3) {
-        Godot::print("Direction::Top");
         return Direction::Top;
     }
     if (y <= 3 && abs(z) < 3 && abs(x) < 3) {
-        Godot::print("Direction::Bottom");
         return Direction::Bottom;
     }
 
