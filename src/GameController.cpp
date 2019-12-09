@@ -101,7 +101,7 @@ bool GameController::_add_structure_in_gridblock(Structure::Type type, GridBlock
 	}
 
 	if (built) {
-		_add_neighboring_grid_blocks_if_dont_exist(gridBlock->get_global_transform().get_origin(), gridBlock->is_on_ground);
+		_add_neighboring_grid_blocks_if_dont_exist(gridBlock->get_global_transform().get_origin());
 	}
 	return built;
 }
@@ -135,18 +135,20 @@ GridBlock* GameController::_build_grid_block_at(Vector3 location, bool is_ground
 	return check_block;
 }
 
-void GameController::_add_neighboring_grid_blocks_if_dont_exist(Vector3 location, bool is_ground) {
+void GameController::_add_neighboring_grid_blocks_if_dont_exist(Vector3 location) {
 	Vector3 grid_location = _to_grid_coordinate(location);
+	GridBlock* block = Object::cast_to<GridBlock>(structures[grid_location]);
+	if (block != nullptr && !block->is_empty()) {
+		Vector3 left = grid_location + Vector3(-GRID_SIZE,0,0);
+		Vector3 right = grid_location + Vector3(GRID_SIZE,0,0);
+		Vector3 front = grid_location + Vector3(0,0,-GRID_SIZE);
+		Vector3 back = grid_location + Vector3(0,0,GRID_SIZE);
 
-	Vector3 left = grid_location + Vector3(-GRID_SIZE,0,0);
-	Vector3 right = grid_location + Vector3(GRID_SIZE,0,0);
-	Vector3 front = grid_location + Vector3(0,0,-GRID_SIZE);
-	Vector3 back = grid_location + Vector3(0,0,GRID_SIZE);
-
-	_build_grid_block_at(left, is_ground);
-	_build_grid_block_at(right, is_ground);
-	_build_grid_block_at(front, is_ground);
-	_build_grid_block_at(back, is_ground);
+		_build_grid_block_at(left, block->is_on_ground);
+		_build_grid_block_at(right, block->is_on_ground);
+		_build_grid_block_at(front, block->is_on_ground);
+		_build_grid_block_at(back, block->is_on_ground);
+	}
 }
 
 bool GameController::_is_gridBlock_connected_to_floor_at(Vector3 location) {
@@ -155,8 +157,38 @@ bool GameController::_is_gridBlock_connected_to_floor_at(Vector3 location) {
 	if (!on_ground) {
 		Array arr = Array(visited.keys());
 		for (int i = 0; i < arr.size(); i++) {
-			remove_gridBlock_at(arr[i]);
-    	} 
+			Vector3 location = arr[i];
+			Vector3 front_location = location + Vector3(0,0,-GRID_SIZE);
+			Vector3 back_location = location + Vector3(0,0,GRID_SIZE);
+			Vector3 right_location = location + Vector3(-GRID_SIZE,0,0);
+			Vector3 left_location = location + Vector3(GRID_SIZE,0,0);
+
+			GridBlock * gridblock = Object::cast_to<GridBlock>(structures[arr[i]]);
+			GridBlock* front = Object::cast_to<GridBlock>(structures[front_location]);
+			GridBlock* back = Object::cast_to<GridBlock>(structures[back_location]);
+			GridBlock* right = Object::cast_to<GridBlock>(structures[right_location]);
+			GridBlock* left = Object::cast_to<GridBlock>(structures[left_location]);
+
+			bool found_neighbor = false;
+			found_neighbor = found_neighbor || (front != nullptr && !visited.has(front_location) && !front->is_empty());
+			found_neighbor = found_neighbor || (back != nullptr && !visited.has(back_location) && !back->is_empty());
+			found_neighbor = found_neighbor || (right != nullptr && !visited.has(right_location) && !right->is_empty());
+			found_neighbor = found_neighbor || (left != nullptr && !visited.has(left_location) && !left->is_empty());
+			
+			if (found_neighbor && gridblock != nullptr) {
+				if (gridblock->is_empty()) {
+					remove_gridBlock_at(arr[i]);
+					_build_grid_block_at(location,gridblock->is_on_ground);
+				}
+			} else {
+				remove_gridBlock_at(arr[i]);
+			}
+    	}
+
+		// Array all_grid_blocks = Array(structures.keys());
+		// for (int i = 0; i < all_grid_blocks.size(); i++) {
+		// 	_add_neighboring_grid_blocks_if_dont_exist(all_grid_blocks[i]);
+		// }
 	}
 	return on_ground;
 }

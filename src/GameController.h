@@ -40,7 +40,7 @@ namespace godot {
 
         private:
         bool _add_structure_in_gridblock(Structure::Type type, GridBlock::Direction direction, GridBlock* gridBlock);
-        void _add_neighboring_grid_blocks_if_dont_exist(Vector3 location, bool is_ground);
+        void _add_neighboring_grid_blocks_if_dont_exist(Vector3 location);
 
         bool _is_gridBlock_connected_to_floor_at(Vector3 location);
 
