@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://bin/Player.gdns" type="Script" id=1]
 
@@ -8,6 +8,12 @@
 
 [sub_resource type="SpatialMaterial" id=3]
 albedo_color = Color( 1, 0.788235, 0.286275, 1 )
+
+[sub_resource type="CubeMesh" id=4]
+
+[sub_resource type="SpatialMaterial" id=5]
+flags_transparent = true
+albedo_color = Color( 0.411765, 0.815686, 0.882353, 0.141176 )
 
 [node name="Player" type="Spatial"]
 script = ExtResource( 1 )
@@ -27,3 +33,11 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.5 )
 
 [node name="RayCast" type="RayCast" parent="KinematicBody/Camera"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1 )
+
+[node name="Placeholder" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4.95414, 0, 0 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Placeholder"]
+transform = Transform( 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 3, 0 )
+mesh = SubResource( 4 )
+material/0 = SubResource( 5 )

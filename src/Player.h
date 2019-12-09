@@ -68,6 +68,7 @@ namespace godot {
 		KinematicBody* me;
 		Camera* camera;
 		RayCast* ray;
+		Spatial* placeholder;
 
 		float moveSpeed;
 		float jumpForce;
@@ -97,6 +98,8 @@ namespace godot {
 
 		float _get_grid_rotation();
 		float _get_grid_tilt();
+
+		void _update_placeholder();
 
 		Vector3 _get_nearest_neighbor_gridBlock_from(Vector3 location);
 		Facing _get_facing_with_tilt();

@@ -44,10 +44,67 @@ void Player::_ready(){
     me = Object::cast_to<KinematicBody>(get_node("KinematicBody"));
     camera = Object::cast_to<Camera>(get_node("KinematicBody/Camera"));
     ray = Object::cast_to<RayCast>(get_node("KinematicBody/Camera/RayCast"));
+    placeholder = Node::cast_to<Spatial>(get_node("Placeholder"));
 }
 
 void Player::_process(float delta) {
+    _update_placeholder();
+}
 
+void Player::_update_placeholder() {
+    if (placeholder == nullptr) {
+        return;
+    }
+    placeholder->hide();
+    if (ray == nullptr) {
+        Godot::print("Ray not found");
+        return;
+    }
+
+    ray->set_collide_with_areas(true);
+    ray->set_collide_with_bodies(true);
+
+    ray->set_enabled(true);
+
+    ray->set_cast_to(Vector3(0,0,-10));
+    ray->force_raycast_update();
+
+    if (ray->is_colliding()) {
+        Object* obj = ray->get_collider();
+        if (obj == nullptr) {
+            return;
+        }
+        StaticBody* body = Object::cast_to<StaticBody>(obj);
+        Area* area = Object::cast_to<Area>(obj);
+        if (body != nullptr) {
+            if (body->get_name() == "FloorStaticBody") {
+                Vector3 location = _to_grid_coordinate(ray->get_collision_point());
+                Basis basis = placeholder->get_global_transform().get_basis();
+                placeholder->set_global_transform(Transform(basis,location));
+                placeholder->show();
+            } else {
+                Vector3 location = _to_grid_coordinate(ray->get_collision_point());
+                Basis basis = placeholder->get_global_transform().get_basis();
+                placeholder->set_global_transform(Transform(basis,location));
+                placeholder->show();
+            }
+        } else if (area != nullptr) {
+            GridBlock* gridBlock = Node::cast_to<GridBlock>(area->get_parent());
+            if (gridBlock != nullptr) {
+                GridBlock::Direction face_direction = gridBlock->_face_at_global_point(ray->get_collision_point());
+                Vector3 gridBlock_location = gridBlock->get_global_transform().get_origin();
+                Vector3 build_location = gridBlock_location;
+                if (face_direction == GridBlock::Direction::Top) {
+                    build_location.y += 6;
+                }
+                Basis basis = placeholder->get_global_transform().get_basis();
+                placeholder->set_global_transform(Transform(basis,build_location));
+                placeholder->show();
+            }
+        }
+    }
+
+    ray->set_enabled(false);
 }
 
 void Player::_input(InputEvent* event) {
