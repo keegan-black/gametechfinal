@@ -23,4 +23,4 @@ mesh = SubResource( 2 )
 material/0 = SubResource( 3 )
 
 [node name="RayCast" type="RayCast" parent="KinematicBody"]
-transform = Transform( 1, 0, 0, 0, 0.5, 0, 0, 0, 1, 0, 0.5, -1.5 )
+transform = Transform( 1, 0, 0, 0, 0.5, 0, 0, 0, 1, 0, 0.5, 0 )

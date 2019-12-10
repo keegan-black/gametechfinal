@@ -4,6 +4,9 @@
 #include <Godot.hpp>
 #include <Area.hpp>
 #include <KinematicBody.hpp>
+#include <RayCast.hpp>
+#include "Player.h"
+#include "GameController.h"
 
 namespace godot {
 
@@ -12,6 +15,9 @@ namespace godot {
 
 	private:
         KinematicBody* me;
+		RayCast* ray;
+		Player* player;
+		GameController* gameController;
 
 		Vector3 gravity;
 		Vector3 terminal_velocity = Vector3(10,10,10);
@@ -44,6 +50,7 @@ namespace godot {
 
         void handle_gravity(Vector3& force, Vector3& gravity);
 		void handle_movement(Vector3& force);
+		Vector3 _to_grid_coordinate(Vector3 location);
 
 	};
 
