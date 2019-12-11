@@ -10,6 +10,7 @@
 #include <SceneTree.hpp>
 #include <Viewport.hpp>
 #include <GameController.h>
+#include "GUI.h"
 
 using namespace godot;
 #define PI 3.14
@@ -45,10 +46,20 @@ void Player::_ready(){
     camera = Object::cast_to<Camera>(get_node("KinematicBody/Camera"));
     ray = Object::cast_to<RayCast>(get_node("KinematicBody/Camera/RayCast"));
     placeholder = Node::cast_to<Spatial>(get_node("Placeholder"));
+
+    //_update_GUI();
 }
 
 void Player::_process(float delta) {
     _update_placeholder();
+}
+
+void Player::_update_GUI() {
+    GUI* gui = Node::cast_to<GUI>(get_node("/root/Spatial/GUI"));
+    if (gui != nullptr) {
+        gui->_set_ammo_label(ammo);
+        gui->_set_materials_label(materials);
+    }
 }
 
 void Player::_update_placeholder() {
@@ -202,14 +213,20 @@ void Player::_physics_process(float delta) {
 }
 
 void Player::_perform_action(Player::Action action, Player::BuildType buildType) {
-    if (action == Action::Shoot) {
+    if (action == Action::Shoot && ammo > 0) {
+        ammo -= 1;
+        _update_GUI();
         _shoot();
     }
     if (action == Action::Melee) {
         _melee();
     }
-    if (action == Action::Build || buildType != BuildType::None) {
-        _build(buildType);
+    if (action == Action::Build && buildType != BuildType::None && materials > 5) {
+        
+        if (_build(buildType)) {
+            materials -= 5;
+            _update_GUI();
+        }
     }
 }
 
@@ -271,11 +288,11 @@ Player::Facing Player::_get_facing_no_tilt() {
 
 }
 
-void Player::_build(Player::BuildType buildType) {
+bool Player::_build(Player::BuildType buildType) {
     GameController* gameController = Node::cast_to<GameController>(get_node("/root/GameController"));
     if (gameController == nullptr) {
         Godot::print("[Error] Game Controller Null");
-        return;
+        return false;
     }
 
     Structure::Type type = Structure::Type::Wall;
@@ -315,7 +332,7 @@ void Player::_build(Player::BuildType buildType) {
 
     if (ray == nullptr) {
         Godot::print("Ray not found");
-        return;
+        return false;
     }
 
     ray->set_collide_with_areas(true);
@@ -326,21 +343,23 @@ void Player::_build(Player::BuildType buildType) {
     ray->set_cast_to(Vector3(0,0,-10));
     ray->force_raycast_update();
 
+    bool built = false;
+
     if (ray->is_colliding()) {
         Object* obj = ray->get_collider();
         if (obj == nullptr) {
-            return;
+            return false;
         }
         StaticBody* body = Object::cast_to<StaticBody>(obj);
         Area* area = Object::cast_to<Area>(obj);
         if (body != nullptr) {
             if (body->get_name() == "FloorStaticBody") {
-                gameController->_add_structure(type,user_direction,ray->get_collision_point(),true);
+                built = gameController->_add_structure(type,user_direction,ray->get_collision_point(),true);
             } else {
                 Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
                 if (structure != nullptr) {
                     // _build_click_on_structure(buildType, ray->get_collision_point(), structure);
-                    gameController->_add_structure(type,user_direction,ray->get_collision_point(),false);
+                    built = gameController->_add_structure(type,user_direction,ray->get_collision_point(),false);
                 }
             }
         } else if (area != nullptr) {
@@ -352,13 +371,14 @@ void Player::_build(Player::BuildType buildType) {
                 if (face_direction == GridBlock::Direction::Top) {
                     build_location.y += 6;
                 }
-                gameController->_add_structure(type,user_direction,build_location,false);
+                built = gameController->_add_structure(type,user_direction,build_location,false);
 
             }
         }
     }
 
     ray->set_enabled(false);
+    return built;
 }
 
 Vector3 Player::_get_nearest_neighbor_gridBlock_from(Vector3 location) {
@@ -411,7 +431,6 @@ void Player::_shoot() {
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
-
                 structure->_take_damage(20);
             }
             
