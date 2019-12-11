@@ -31,9 +31,9 @@ namespace godot {
 
         void _set_materials_label(int materials);
         void _set_ammo_label(int materials);
-        void _set_zombie_tower_health_bar(int health);
-        void _set_player_tower_health_bar(int health);
-        void _set_player_health_bar(int health);
+        void _set_zombie_tower_health_bar(float health);
+        void _set_player_tower_health_bar(float health);
+        void _set_player_health_bar(float health);
         void _set_round_label(int round);
 
         void _process(float delta);

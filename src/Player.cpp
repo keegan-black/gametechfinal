@@ -69,7 +69,7 @@ void Player::_update_GUI() {
     }
 }
 
-void Player::_take_damage(int damage) {
+void Player::_take_damage(float damage) {
     health -= damage;
     _update_GUI();
 }
@@ -443,7 +443,7 @@ void Player::_shoot() {
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
-                structure->_take_damage(20);
+                structure->_take_damage(60);
             } else {
                 Tower* tower = Node::cast_to<Tower>(body->get_parent()->get_parent());
                 if (tower != nullptr) {
@@ -456,7 +456,7 @@ void Player::_shoot() {
         if (kin != nullptr) {
             Zombie* zombie = Node::cast_to<Zombie>(kin->get_parent());
             if (zombie != nullptr) {
-                zombie->_take_damage(20);
+                zombie->_take_damage(60);
             }
         }
     }
@@ -486,7 +486,12 @@ void Player::_melee() {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
                 Vector3 location = structure->get_global_transform().get_origin();
-                structure->_take_damage(100);
+                structure->_take_damage(20);
+            } else {
+                Tower* tower = Node::cast_to<Tower>(body->get_parent()->get_parent());
+                if (tower != nullptr) {
+                    tower->_take_damage(1);
+                }
             }
         } 
         KinematicBody* kin = Object::cast_to<KinematicBody>(obj);

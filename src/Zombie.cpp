@@ -119,7 +119,7 @@ void Zombie::_process(float delta) {
     ray->set_enabled(true);
 
     Vector3 current_location = me->get_global_transform().get_origin();
-    ray->set_cast_to((target-current_location).normalized() * 4);
+    ray->set_cast_to((target-current_location).normalized() * 2);
     ray->force_raycast_update();
 
     if (ray->is_colliding()) {
@@ -135,7 +135,7 @@ void Zombie::_process(float delta) {
         } else if (kin != nullptr) {
             Player* local_player = Node::cast_to<Player>(kin->get_parent());
             if (local_player != nullptr) {
-                local_player->_take_damage(1);
+                local_player->_take_damage(0.1);
             }
         }
     }

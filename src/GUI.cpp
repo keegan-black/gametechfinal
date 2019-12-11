@@ -45,17 +45,17 @@ void GUI::_set_ammo_label(int ammo) {
 	}
 }
 
-void GUI::_set_zombie_tower_health_bar(int health) {
+void GUI::_set_zombie_tower_health_bar(float health) {
 	if (zombie_tower_health_bar != nullptr) {
 		zombie_tower_health_bar->set_value(health);
 	}
 }
-void GUI::_set_player_tower_health_bar(int health) {
+void GUI::_set_player_tower_health_bar(float health) {
 	if (player_tower_health_bar != nullptr) {
 		player_tower_health_bar->set_value(health);
 	}
 }
-void GUI::_set_player_health_bar(int health) {
+void GUI::_set_player_health_bar(float health) {
 	if (player_health_bar != nullptr) {
 		player_health_bar->set_value(health);
 	}
