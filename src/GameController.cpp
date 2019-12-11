@@ -3,6 +3,7 @@
 #include <ResourceLoader.hpp>
 #include <PackedScene.hpp>
 #include <Viewport.hpp>
+#include <Zombie.h>
 
 using namespace godot;
 #define PI 3.14
@@ -28,6 +29,35 @@ void GameController::_ready(){
 }
 
 void GameController::_process(float delta) {
+	if (timer > 0) {
+		timer -= delta;
+	}
+
+	if (zombies_to_spawn > 0 && timer <= 0) {
+		timer = 10;
+		zombies_to_spawn -= 1;
+		_spawn_zombie();
+	}
+
+}
+
+void GameController::_spawn_zombie() {
+
+	if (zombieTower == nullptr || playerTower == nullptr) {
+		Godot::print("Zombie Spawn Tower Nil");
+		return;
+	}
+
+    ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
+    Ref<PackedScene> zombieScene = resourceLoader->load("res://Zombie.tscn");
+    Zombie* zombie = Node::cast_to<Zombie>(zombieScene->instance());
+    get_node("/root/Spatial")->add_child(zombie);
+	zombie->set_global_transform(Transform(zombie->get_global_transform().get_basis(),zombieTower->get_global_transform().get_origin() + Vector3(-10,5,0)));
+	zombie->_set_target(playerTower->get_global_transform().get_origin());
+
+	//Move speed normally 5
+	int randSpeed = rand()%(8-5 + 1) + 5;
+	zombie->_set_move_speed(randSpeed);
 
 }
 
@@ -52,6 +82,9 @@ void GameController::_game_start() {
 	playerTower = Node::cast_to<Tower>(get_node("/root/Spatial/PlayerTower"));
 	zombieTower = Node::cast_to<Tower>(get_node("/root/Spatial/ZombieTower"));
 	gui = Node::cast_to<GUI>(get_node("/root/Spatial/GUI"));
+
+	timer = 10;
+	zombies_to_spawn = 5;
 }
 
 void GameController::_round_complete() {
@@ -65,12 +98,17 @@ void GameController::_round_complete() {
 	if (playerTower != nullptr) {
 		playerTower->health = 100;
 	}
+
+	timer = 10;
+	zombies_to_spawn = 5 + level * level;
 }
 
 void GameController::_game_over() {
 	level = 0;
 	playerTower = nullptr;
 	zombieTower = nullptr;
+	timer = 0;
+	zombies_to_spawn = 0;
 	gui = nullptr;
 	get_tree()->change_scene("res://Menu.tscn");
 }

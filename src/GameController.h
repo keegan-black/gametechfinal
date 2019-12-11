@@ -14,7 +14,7 @@ namespace godot {
 		GODOT_CLASS(GameController, Node)
 
 	private:
-        
+
         using Graph = Dictionary;
         Graph structures;
         // Vector3 -> Gridblock
@@ -27,6 +27,8 @@ namespace godot {
         GUI* gui = nullptr;
 
         int level = 1;
+        float timer = 0;
+        int zombies_to_spawn = 0;
         
 
         GameController();
@@ -43,6 +45,7 @@ namespace godot {
 
         bool _add_structure(Structure::Type type, GridBlock::Direction direction, Vector3 location, bool is_ground = false);
         void _check_gridblock_and_delete(Vector3 location);
+        void _spawn_zombie();
 
         void _tower_death_signal(Tower* tower);
         void _tower_health_signal(Tower* tower);

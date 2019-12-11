@@ -72,6 +72,13 @@ void Player::_update_GUI() {
 void Player::_take_damage(float damage) {
     health -= damage;
     _update_GUI();
+
+    if (health < 0) {
+        GameController* gameController = Node::cast_to<GameController>(get_node("/root/GameController"));
+        if (gameController != nullptr) {
+            gameController->_game_over();
+        }
+    }
 }
 
 void Player::_update_placeholder() {

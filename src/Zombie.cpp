@@ -41,6 +41,11 @@ void Zombie::_ready(){
     gameController = Object::cast_to<GameController>(get_node("/root/GameController"));
 }
 
+void Zombie::_set_move_speed(float speed) {
+    moveSpeed = speed;
+    terminal_velocity = Vector3(moveSpeed,moveSpeed,moveSpeed);
+}
+
 void Zombie::_physics_process(float delta) {
     _move();
 }
@@ -94,7 +99,7 @@ void Zombie::_process(float delta) {
     if (player != nullptr) {
         Vector3 player_location = player->me->get_global_transform().get_origin();
         Vector3 location = me->get_global_transform().get_origin();
-        if (location.distance_to(player_location) < 50) {
+        if (location.distance_to(player_location) < 25) {
             _set_target(player_location);
             goto location_set;
         }
@@ -119,7 +124,7 @@ void Zombie::_process(float delta) {
     ray->set_enabled(true);
 
     Vector3 current_location = me->get_global_transform().get_origin();
-    ray->set_cast_to((target-current_location).normalized() * 2);
+    ray->set_cast_to((target-current_location).normalized() * 3);
     ray->force_raycast_update();
 
     if (ray->is_colliding()) {
@@ -129,7 +134,12 @@ void Zombie::_process(float delta) {
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
-                structure->_take_damage(20);
+                structure->_take_damage(5);
+            } else {
+                Tower* tower = Node::cast_to<Tower>(body->get_parent()->get_parent());
+                if (tower != nullptr) {
+                    tower->_take_damage(.05);
+                }
             }
             
         } else if (kin != nullptr) {

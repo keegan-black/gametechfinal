@@ -42,6 +42,7 @@ namespace godot {
 		void _physics_process(float delta);
         void _take_damage(float damage);
 		void _ready();
+		void _set_move_speed(float speed);
 
         void _set_target(Vector3 target);
         void _move();

@@ -11,8 +11,6 @@ namespace godot {
 
 	private:
     
-    
-
 	public:
     
     static void _register_methods();
