@@ -222,7 +222,6 @@ rounded = true
 percent_visible = false
 
 [node name="TowerHealth" type="MarginContainer" parent="."]
-editor/display_folded = true
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -350.0
@@ -232,7 +231,7 @@ margin_bottom = 40.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TowerHealth"]
 margin_right = 300.0
-margin_bottom = 39.0
+margin_bottom = 82.0
 
 [node name="Health" type="Label" parent="TowerHealth/VBoxContainer"]
 margin_right = 300.0
@@ -240,10 +239,28 @@ margin_bottom = 21.0
 custom_fonts/font = ExtResource( 2 )
 text = "Tower Health"
 
-[node name="TowerHealthBar" type="ProgressBar" parent="TowerHealth/VBoxContainer"]
+[node name="PlayerTowerHealthBar" type="ProgressBar" parent="TowerHealth/VBoxContainer"]
 margin_top = 25.0
 margin_right = 300.0
 margin_bottom = 39.0
+rect_min_size = Vector2( 0, 14 )
+custom_styles/fg = ExtResource( 3 )
+step = 1.0
+value = 50.0
+rounded = true
+percent_visible = false
+
+[node name="Health2" type="Label" parent="TowerHealth/VBoxContainer"]
+margin_top = 43.0
+margin_right = 300.0
+margin_bottom = 64.0
+custom_fonts/font = ExtResource( 2 )
+text = "Zombie Tower Health"
+
+[node name="ZombieTowerHealthBar" type="ProgressBar" parent="TowerHealth/VBoxContainer"]
+margin_top = 68.0
+margin_right = 300.0
+margin_bottom = 82.0
 rect_min_size = Vector2( 0, 14 )
 custom_styles/fg = ExtResource( 3 )
 step = 1.0
@@ -261,7 +278,7 @@ margin_bottom = 21.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Round"]
 margin_right = 300.0
-margin_bottom = 118.0
+margin_bottom = 70.0
 
 [node name="Round" type="Label" parent="Round/VBoxContainer"]
 margin_right = 300.0

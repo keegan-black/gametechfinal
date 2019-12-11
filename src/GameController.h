@@ -6,6 +6,7 @@
 #include "Tower.h"
 #include "Structure.h"
 #include "GridBlock.h"
+#include "GUI.h"
 
 namespace godot {
 
@@ -23,6 +24,7 @@ namespace godot {
 
         Tower* playerTower = nullptr;
         Tower* zombieTower = nullptr;
+        GUI* gui = nullptr;
 
         int level = 0;
         
@@ -35,8 +37,14 @@ namespace godot {
         void _process(float delta);
         void _ready();
 
+        void _round_complete();
+        void _game_over();
+
         bool _add_structure(Structure::Type type, GridBlock::Direction direction, Vector3 location, bool is_ground = false);
         void _check_gridblock_and_delete(Vector3 location);
+
+        void _tower_death_signal(Tower* tower);
+        void _tower_health_signal(Tower* tower);
 
         private:
         bool _add_structure_in_gridblock(Structure::Type type, GridBlock::Direction direction, GridBlock* gridBlock);
@@ -45,6 +53,7 @@ namespace godot {
         bool _is_gridBlock_connected_to_floor_at(Vector3 location);
 
         bool _find_ground_dfs(Vector3 location, Dictionary& visited);
+
 
         GridBlock* _build_grid_block_at(Vector3 location, bool is_ground);
         Vector3 _to_grid_coordinate(Vector3 location);

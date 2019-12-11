@@ -26,9 +26,37 @@ void GameController::_init() {
 void GameController::_ready(){
 	playerTower = Node::cast_to<Tower>(get_node("/root/Spatial/PlayerTower"));
 	zombieTower = Node::cast_to<Tower>(get_node("/root/Spatial/ZombieTower"));
+	gui = Node::cast_to<GUI>(get_node("/root/Spatial/GUI"));
 }
 
 void GameController::_process(float delta) {
+
+}
+
+void GameController::_tower_death_signal(Tower* tower) {
+	if (tower == playerTower) {
+		_game_over();
+	} else if (tower == zombieTower) {
+		_round_complete();
+	}
+}
+
+void GameController::_tower_health_signal(Tower* tower) {
+	Godot::print("tower health signal");
+	if (tower == playerTower && gui != nullptr) {
+		gui->_set_player_tower_health_bar(tower->health);
+	} else if (tower == zombieTower && gui != nullptr) {
+		gui->_set_zombie_tower_health_bar(tower->health);
+	}
+}
+
+void GameController::_round_complete() {
+	level +=1;
+}
+
+void GameController::_game_over() {
+	level = 0;
+
 }
 
 bool GameController::_add_structure(Structure::Type type, GridBlock::Direction direction, Vector3 location,bool is_ground) {

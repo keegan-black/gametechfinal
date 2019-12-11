@@ -23,7 +23,7 @@ namespace godot {
 
         Type type = Type::Enemy;
 
-        float health = 100.0;
+        float health = 100;
         
 
         Tower();
@@ -32,6 +32,7 @@ namespace godot {
         void _init(); // our initializer called by Godot
 
         void _process(float delta);
+        void _take_damage(float damage);
         void _ready();
 
 	private:

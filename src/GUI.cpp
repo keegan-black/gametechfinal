@@ -23,10 +23,12 @@ void GUI::_ready(){
 	ammo_label = cast_to<Label>(get_node("PlayerItems/VBoxContainer/HBoxAmmo/AmmoLabel"));
 	materials_label = cast_to<Label>(get_node("PlayerItems/VBoxContainer/HBoxMaterials/MaterialsLabel"));
 	player_health_bar = cast_to<ProgressBar>(get_node("PlayerHealth/VBoxContainer/PlayerHealthBar"));
-	tower_health_bar = cast_to<ProgressBar>(get_node("TowerHealth/VBoxContainer/TowerHealthBar"));
+	zombie_tower_health_bar = cast_to<ProgressBar>(get_node("TowerHealth/VBoxContainer/ZombieTowerHealthBar"));
+	player_tower_health_bar = cast_to<ProgressBar>(get_node("TowerHealth/VBoxContainer/PlayerTowerHealthBar"));
 	_set_materials_label(100);
 	_set_ammo_label(20);
-	_set_tower_health_bar(100);
+	_set_zombie_tower_health_bar(100);
+	_set_player_tower_health_bar(100);
 	_set_player_health_bar(100);
 	_set_round_label(1);
 }
@@ -43,9 +45,14 @@ void GUI::_set_ammo_label(int ammo) {
 	}
 }
 
-void GUI::_set_tower_health_bar(int health) {
-	if (tower_health_bar != nullptr) {
-		tower_health_bar->set_value(health);
+void GUI::_set_zombie_tower_health_bar(int health) {
+	if (zombie_tower_health_bar != nullptr) {
+		zombie_tower_health_bar->set_value(health);
+	}
+}
+void GUI::_set_player_tower_health_bar(int health) {
+	if (player_tower_health_bar != nullptr) {
+		player_tower_health_bar->set_value(health);
 	}
 }
 void GUI::_set_player_health_bar(int health) {

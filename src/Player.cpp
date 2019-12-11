@@ -438,6 +438,11 @@ void Player::_shoot() {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
                 structure->_take_damage(20);
+            } else {
+                Tower* tower = Node::cast_to<Tower>(body->get_parent()->get_parent());
+                if (tower != nullptr) {
+                    tower->_take_damage(10);
+                }
             }
             
         } 
