@@ -82,6 +82,7 @@ namespace godot {
 
 		int ammo = 20;
 		int materials = 100;
+		int health = 100;
 
 		static void _register_methods();
 
@@ -95,6 +96,7 @@ namespace godot {
 		void _input(InputEvent *event);
         void _move(FrontDirection front_direction, SideDirection side_direction, MovementAction action);
 		void _perform_action(Action action, BuildType buildType);
+		void _take_damage(int damage);
 		void _ready();
 
 	private:

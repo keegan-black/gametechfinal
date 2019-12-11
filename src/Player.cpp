@@ -59,7 +59,13 @@ void Player::_update_GUI() {
     if (gui != nullptr) {
         gui->_set_ammo_label(ammo);
         gui->_set_materials_label(materials);
+        gui->_set_player_health_bar(health);
     }
+}
+
+void Player::_take_damage(int damage) {
+    health -= damage;
+    _update_GUI();
 }
 
 void Player::_update_placeholder() {

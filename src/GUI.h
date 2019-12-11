@@ -5,6 +5,7 @@
 #include <Area.hpp>
 #include <Control.hpp>
 #include <Label.hpp>
+#include <ProgressBar.hpp>
 
 namespace godot {
 
@@ -13,8 +14,11 @@ namespace godot {
 
 	public:
 
+        Label* round_label;
         Label* ammo_label;
         Label* materials_label;
+        ProgressBar* player_health_bar;
+        ProgressBar* tower_health_bar;
     
     static void _register_methods();
         
@@ -26,6 +30,9 @@ namespace godot {
 
         void _set_materials_label(int materials);
         void _set_ammo_label(int materials);
+        void _set_tower_health_bar(int health);
+        void _set_player_health_bar(int health);
+        void _set_round_label(int round);
 
         void _process(float delta);
         void _ready();

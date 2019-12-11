@@ -118,18 +118,25 @@ void Zombie::_process(float delta) {
 
     ray->set_enabled(true);
 
-    ray->set_cast_to(Vector3(-4,0,0));
+    Vector3 current_location = me->get_global_transform().get_origin();
+    ray->set_cast_to((target-current_location).normalized() * 4);
     ray->force_raycast_update();
 
     if (ray->is_colliding()) {
         Object* obj = ray->get_collider();
         StaticBody* body = Object::cast_to<StaticBody>(obj);
+        KinematicBody* kin = Object::cast_to<KinematicBody>(obj);
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
                 structure->_take_damage(20);
             }
             
+        } else if (kin != nullptr) {
+            Player* local_player = Node::cast_to<Player>(kin->get_parent());
+            if (local_player != nullptr) {
+                local_player->_take_damage(1);
+            }
         }
     }
 

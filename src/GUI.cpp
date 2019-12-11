@@ -19,10 +19,16 @@ void GUI::_init() {
 }
 
 void GUI::_ready(){
-	ammo_label = cast_to<Label>(get_node("MarginContainer/VBoxContainer/HBoxAmmo/AmmoLabel"));
-	materials_label = cast_to<Label>(get_node("MarginContainer/VBoxContainer/HBoxMaterials/MaterialsLabel"));
+	round_label = cast_to<Label>(get_node("Round/VBoxContainer/RoundLabel"));
+	ammo_label = cast_to<Label>(get_node("PlayerItems/VBoxContainer/HBoxAmmo/AmmoLabel"));
+	materials_label = cast_to<Label>(get_node("PlayerItems/VBoxContainer/HBoxMaterials/MaterialsLabel"));
+	player_health_bar = cast_to<ProgressBar>(get_node("PlayerHealth/VBoxContainer/PlayerHealthBar"));
+	tower_health_bar = cast_to<ProgressBar>(get_node("TowerHealth/VBoxContainer/TowerHealthBar"));
 	_set_materials_label(100);
 	_set_ammo_label(20);
+	_set_tower_health_bar(100);
+	_set_player_health_bar(100);
+	_set_round_label(1);
 }
 
 void GUI::_set_materials_label(int materials) {
@@ -34,6 +40,23 @@ void GUI::_set_materials_label(int materials) {
 void GUI::_set_ammo_label(int ammo) {
 	if (ammo_label != nullptr) {
 		ammo_label->set_text(std::to_string(ammo).c_str());
+	}
+}
+
+void GUI::_set_tower_health_bar(int health) {
+	if (tower_health_bar != nullptr) {
+		tower_health_bar->set_value(health);
+	}
+}
+void GUI::_set_player_health_bar(int health) {
+	if (player_health_bar != nullptr) {
+		player_health_bar->set_value(health);
+	}
+}
+
+void GUI::_set_round_label(int round) {
+	if (round_label != nullptr) {
+		round_label->set_text(std::to_string(round).c_str());
 	}
 }
 
