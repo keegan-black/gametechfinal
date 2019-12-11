@@ -6,10 +6,10 @@
 [node name="Control" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -0.70459
-margin_top = 0.704651
-margin_right = -0.70459
-margin_bottom = 0.704651
+margin_left = -3.64673
+margin_top = 1.71472
+margin_right = -3.64673
+margin_bottom = 1.71472
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 anchor_left = 0.5
@@ -31,16 +31,15 @@ texture = ExtResource( 1 )
 [node name="MarginContainer" type="MarginContainer" parent="."]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 20.0
+margin_left = 80.0
 margin_top = -80.0
-margin_right = 79.0
-margin_bottom = -66.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 margin_right = 98.0
-margin_bottom = 46.0
+margin_bottom = 80.0
 
 [node name="HBoxAmmo" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+editor/display_folded = true
 margin_right = 98.0
 margin_bottom = 21.0
 alignment = 1
@@ -77,3 +76,164 @@ margin_right = 98.0
 margin_bottom = 21.0
 custom_fonts/font = ExtResource( 2 )
 text = "0"
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -118.0
+margin_top = -80.0
+margin_right = 118.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2"]
+margin_right = 236.0
+margin_bottom = 80.0
+
+[node name="HBoxAmmo" type="HBoxContainer" parent="MarginContainer2/VBoxContainer"]
+margin_right = 236.0
+margin_bottom = 21.0
+custom_constants/separation = 20
+alignment = 1
+
+[node name="Ramp" type="Label" parent="MarginContainer2/VBoxContainer/HBoxAmmo"]
+margin_right = 70.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Ramp: F"
+
+[node name="Wall" type="Label" parent="MarginContainer2/VBoxContainer/HBoxAmmo"]
+margin_left = 90.0
+margin_right = 151.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Wall: R"
+
+[node name="Floor" type="Label" parent="MarginContainer2/VBoxContainer/HBoxAmmo"]
+margin_left = 171.0
+margin_right = 236.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Floor: E"
+
+[node name="HBoxAmmo2" type="HBoxContainer" parent="MarginContainer2/VBoxContainer"]
+margin_top = 25.0
+margin_right = 236.0
+margin_bottom = 46.0
+custom_constants/separation = 20
+alignment = 1
+
+[node name="Shoot" type="Label" parent="MarginContainer2/VBoxContainer/HBoxAmmo2"]
+margin_left = 37.0
+margin_right = 107.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Shoot: T"
+
+[node name="Melee" type="Label" parent="MarginContainer2/VBoxContainer/HBoxAmmo2"]
+margin_left = 127.0
+margin_right = 199.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Melee: C"
+
+[node name="MarginContainer3" type="MarginContainer" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -300.0
+margin_top = -80.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer3"]
+margin_right = 300.0
+margin_bottom = 80.0
+
+[node name="HBoxAmmo" type="HBoxContainer" parent="MarginContainer3/VBoxContainer"]
+margin_right = 300.0
+margin_bottom = 21.0
+custom_constants/separation = 20
+alignment = 1
+
+[node name="Ramp" type="Label" parent="MarginContainer3/VBoxContainer/HBoxAmmo"]
+margin_left = 17.0
+margin_right = 74.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Left: A"
+
+[node name="Wall" type="Label" parent="MarginContainer3/VBoxContainer/HBoxAmmo"]
+margin_left = 94.0
+margin_right = 194.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Forward: W"
+
+[node name="Floor" type="Label" parent="MarginContainer3/VBoxContainer/HBoxAmmo"]
+margin_left = 214.0
+margin_right = 283.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Right: D"
+
+[node name="HBoxAmmo2" type="HBoxContainer" parent="MarginContainer3/VBoxContainer"]
+margin_top = 25.0
+margin_right = 300.0
+margin_bottom = 46.0
+custom_constants/separation = 20
+alignment = 1
+
+[node name="Melee" type="Label" parent="MarginContainer3/VBoxContainer/HBoxAmmo2"]
+margin_left = 118.0
+margin_right = 181.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Back: S"
+
+[node name="MarginContainer4" type="MarginContainer" parent="."]
+margin_left = 50.0
+margin_top = 50.0
+margin_right = 400.0
+margin_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer4"]
+margin_right = 350.0
+margin_bottom = 39.0
+
+[node name="Health" type="Label" parent="MarginContainer4/VBoxContainer"]
+margin_right = 350.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Health"
+
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer4/VBoxContainer"]
+margin_top = 25.0
+margin_right = 350.0
+margin_bottom = 39.0
+rounded = true
+percent_visible = false
+
+[node name="MarginContainer5" type="MarginContainer" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -350.0
+margin_top = 50.0
+margin_right = -50.0
+margin_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer5"]
+margin_right = 300.0
+margin_bottom = 27.0
+
+[node name="Health" type="Label" parent="MarginContainer5/VBoxContainer"]
+margin_right = 300.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 2 )
+text = "Tower Health"
+
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer5/VBoxContainer"]
+margin_top = 25.0
+margin_right = 300.0
+margin_bottom = 39.0
+rounded = true
+percent_visible = false
