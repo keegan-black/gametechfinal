@@ -24,9 +24,7 @@ void GameController::_init() {
 }
 
 void GameController::_ready(){
-	playerTower = Node::cast_to<Tower>(get_node("/root/Spatial/PlayerTower"));
-	zombieTower = Node::cast_to<Tower>(get_node("/root/Spatial/ZombieTower"));
-	gui = Node::cast_to<GUI>(get_node("/root/Spatial/GUI"));
+	
 }
 
 void GameController::_process(float delta) {
@@ -50,13 +48,31 @@ void GameController::_tower_health_signal(Tower* tower) {
 	}
 }
 
+void GameController::_game_start() {
+	playerTower = Node::cast_to<Tower>(get_node("/root/Spatial/PlayerTower"));
+	zombieTower = Node::cast_to<Tower>(get_node("/root/Spatial/ZombieTower"));
+	gui = Node::cast_to<GUI>(get_node("/root/Spatial/GUI"));
+}
+
 void GameController::_round_complete() {
 	level +=1;
+	if (gui != nullptr) {
+		gui->_set_round_label(level);
+	}
+	if (zombieTower != nullptr) {
+		zombieTower->health = 100;
+	}
+	if (playerTower != nullptr) {
+		playerTower->health = 100;
+	}
 }
 
 void GameController::_game_over() {
 	level = 0;
-
+	playerTower = nullptr;
+	zombieTower = nullptr;
+	gui = nullptr;
+	get_tree()->change_scene("res://Menu.tscn");
 }
 
 bool GameController::_add_structure(Structure::Type type, GridBlock::Direction direction, Vector3 location,bool is_ground) {

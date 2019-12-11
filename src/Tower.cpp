@@ -29,13 +29,16 @@ void Tower::_ready(){
 void Tower::_take_damage(float damage) {
 	health -= damage;
 	Godot::print(std::to_string(health).c_str());
-	if (health <= 0) {
-		//Die
-	}
 	GameController* gameController = Node::cast_to<GameController>(get_node("/root/GameController"));
 	if (gameController != nullptr) {
 		gameController->_tower_health_signal(this);
+		
+		if (health <= 0) {
+			gameController->_tower_death_signal(this);
+		}	
 	}
+
+	
 }
 
 void Tower::_process(float delta) {

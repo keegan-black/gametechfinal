@@ -26,7 +26,7 @@ namespace godot {
         Tower* zombieTower = nullptr;
         GUI* gui = nullptr;
 
-        int level = 0;
+        int level = 1;
         
 
         GameController();
@@ -37,6 +37,7 @@ namespace godot {
         void _process(float delta);
         void _ready();
 
+        void _game_start();
         void _round_complete();
         void _game_over();
 

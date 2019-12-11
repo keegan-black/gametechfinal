@@ -28,6 +28,8 @@ Player::Player() {
 
 Player::~Player() {
 	// add your cleanup here
+    input = Input::get_singleton();
+    input->set_mouse_mode(Input::MOUSE_MODE_VISIBLE);
 }
 
 
@@ -47,6 +49,10 @@ void Player::_ready(){
     ray = Object::cast_to<RayCast>(get_node("KinematicBody/Camera/RayCast"));
     placeholder = Node::cast_to<Spatial>(get_node("Placeholder"));
 
+    GameController* gameController = Node::cast_to<GameController>(get_node("/root/GameController"));
+    if (gameController != nullptr) {
+        gameController->_game_start();
+    }
     //_update_GUI();
 }
 

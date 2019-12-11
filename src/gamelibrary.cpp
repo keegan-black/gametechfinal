@@ -6,6 +6,7 @@
 #include "GameController.h"
 #include "Tower.h"
 #include "GUI.h"
+#include "Menu.h"
 
 extern "C" void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *o) {
     godot::Godot::gdnative_init(o);
@@ -25,4 +26,5 @@ extern "C" void GDN_EXPORT godot_nativescript_init(void *handle) {
    godot::register_class<godot::GameController>();
    godot::register_class<godot::Tower>();
    godot::register_class<godot::GUI>();
+   godot::register_class<godot::Menu>();
 }
