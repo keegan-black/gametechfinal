@@ -189,7 +189,7 @@ void Zombie::_process(float delta) {
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
-                structure->_take_damage(0.05);
+                structure->_take_damage(.5);
             } else {
                 Tower* tower = Node::cast_to<Tower>(body->get_parent()->get_parent());
                 if (tower != nullptr && tower->type == Tower::Type::Player) {
