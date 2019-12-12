@@ -205,7 +205,7 @@ void Player::_physics_process(float delta) {
     Action action = Action::None;
     BuildType buildType = BuildType::None;
 
-    if (input->is_key_pressed(84)) { // T
+    if (input->is_key_pressed(84) || input->is_mouse_button_pressed(1)) { // T
         if (!is_shooting) {
             is_shooting = true;
             action = Action::Shoot;
@@ -484,7 +484,7 @@ void Player::_shoot() {
                 structure->_take_damage(60);
             } else {
                 Tower* tower = Node::cast_to<Tower>(body->get_parent()->get_parent());
-                if (tower != nullptr) {
+                if (tower != nullptr && tower->type == Tower::Type::Enemy) {
                     tower->_take_damage(10);
                 }
             }

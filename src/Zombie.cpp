@@ -192,7 +192,7 @@ void Zombie::_process(float delta) {
                 structure->_take_damage(0.05);
             } else {
                 Tower* tower = Node::cast_to<Tower>(body->get_parent()->get_parent());
-                if (tower != nullptr) {
+                if (tower != nullptr && tower->type == Tower::Type::Player) {
                     tower->_take_damage(.05);
                 }
             }

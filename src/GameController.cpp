@@ -87,7 +87,9 @@ void GameController::_zombie_death_signal() {
 
 void GameController::_game_start() {
 	playerTower = Node::cast_to<Tower>(get_node("/root/Spatial/PlayerTower"));
+	playerTower->type = Tower::Type::Player;
 	zombieTower = Node::cast_to<Tower>(get_node("/root/Spatial/ZombieTower"));
+	zombieTower->type = Tower::Type::Enemy;
 	gui = Node::cast_to<GUI>(get_node("/root/Spatial/GUI"));
 	timer = 5.0;
 	zombies_to_spawn = 5;
