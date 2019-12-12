@@ -179,7 +179,7 @@ void Zombie::_process(float delta) {
     ray->set_enabled(true);
 
     Vector3 current_location = me->get_global_transform().get_origin();
-    ray->set_cast_to((target-current_location).normalized() * 3);
+    ray->set_cast_to((target-current_location).normalized() * 4);
     ray->force_raycast_update();
 
     if (ray->is_colliding()) {
@@ -189,7 +189,7 @@ void Zombie::_process(float delta) {
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
-                structure->_take_damage(1);
+                structure->_take_damage(0.05);
             } else {
                 Tower* tower = Node::cast_to<Tower>(body->get_parent()->get_parent());
                 if (tower != nullptr) {
