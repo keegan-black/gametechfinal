@@ -45,7 +45,7 @@ void Player::_init() {
 
 void Player::_ready(){
     input = Input::get_singleton();
-    input->set_mouse_mode(Input::MOUSE_MODE_HIDDEN);
+    input->set_mouse_mode(Input::MOUSE_MODE_CAPTURED);
     me = Object::cast_to<KinematicBody>(get_node("KinematicBody"));
     camera = Object::cast_to<Camera>(get_node("KinematicBody/Camera"));
     ray = Object::cast_to<RayCast>(get_node("KinematicBody/Camera/RayCast"));
