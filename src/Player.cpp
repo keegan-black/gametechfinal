@@ -11,6 +11,8 @@
 #include <Viewport.hpp>
 #include <GameController.h>
 #include "GUI.h"
+#include <Particles.hpp>
+#include "Bullet.h"
 
 using namespace godot;
 #define PI 3.14
@@ -62,6 +64,9 @@ void Player::_process(float delta) {
 
 void Player::_pickup_health(float health) {
     this->health += health;
+    if (this->health > 100) {
+        this->health = 100;
+    }
     _update_GUI();
 }
 
@@ -456,7 +461,18 @@ void Player::_shoot() {
 
     ray->set_enabled(true);
 
-    ray->set_cast_to(Vector3(0,0,-20));
+    ray->set_cast_to(Vector3(0,0,-40));
+
+    ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
+    Ref<PackedScene> bulletScence = resourceLoader->load("res://Bullet.tscn");
+    Bullet* bullet = Node::cast_to<Bullet>(bulletScence->instance());
+    if (bullet != nullptr) {
+        get_node("/root/Spatial")->add_child(bullet);
+        bullet->set_global_transform(Transform(bullet->get_global_transform().get_basis(), camera->get_global_transform().get_origin()));
+        bullet->_set_direction_towards(camera->get_global_transform().get_basis().z * -1);
+    }
+
+
     ray->force_raycast_update();
 
     if (ray->is_colliding()) {

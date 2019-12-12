@@ -10,6 +10,7 @@
 #include "Health.h"
 #include "Ammo.h"
 #include "Materials.h"
+#include "Bullet.h"
 
 extern "C" void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *o) {
     godot::Godot::gdnative_init(o);
@@ -33,4 +34,5 @@ extern "C" void GDN_EXPORT godot_nativescript_init(void *handle) {
    godot::register_class<godot::Health>();
    godot::register_class<godot::Ammo>();
    godot::register_class<godot::Materials>();
+   godot::register_class<godot::Bullet>();
 }
