@@ -498,7 +498,7 @@ void Player::_melee() {
 
     ray->set_enabled(true);
 
-    ray->set_cast_to(Vector3(0,0,-2));
+    ray->set_cast_to(Vector3(0,0,-3));
     ray->force_raycast_update();
 
     if (ray->is_colliding()) {
