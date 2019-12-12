@@ -17,6 +17,7 @@ namespace godot {
         Label* round_label;
         Label* ammo_label;
         Label* materials_label;
+        Label* enemies_left_label;
         ProgressBar* player_health_bar;
         ProgressBar* player_tower_health_bar;
         ProgressBar* zombie_tower_health_bar;
@@ -35,6 +36,7 @@ namespace godot {
         void _set_player_tower_health_bar(float health);
         void _set_player_health_bar(float health);
         void _set_round_label(int round);
+        void _set_enemies_left_label(int enemies_left);
 
         void _process(float delta);
         void _ready();

@@ -34,7 +34,7 @@ void GameController::_process(float delta) {
 	}
 
 	if (zombies_to_spawn > 0 && timer <= 0) {
-		timer = 2;
+		timer = timerValue;
 		zombies_to_spawn -= 1;
 		_spawn_zombie();
 	}
@@ -78,29 +78,52 @@ void GameController::_tower_health_signal(Tower* tower) {
 	}
 }
 
+void GameController::_zombie_death_signal() {
+	zombies_alive -= 1;
+	if (gui != nullptr) {
+		gui->_set_enemies_left_label(zombies_alive);
+	}
+}
+
 void GameController::_game_start() {
 	playerTower = Node::cast_to<Tower>(get_node("/root/Spatial/PlayerTower"));
 	zombieTower = Node::cast_to<Tower>(get_node("/root/Spatial/ZombieTower"));
 	gui = Node::cast_to<GUI>(get_node("/root/Spatial/GUI"));
-
-	timer = 2;
+	timer = 5.0;
 	zombies_to_spawn = 5;
+	zombies_alive = zombies_to_spawn;
+	if (gui != nullptr) {
+		// gui->_set_enemies_left_label(zombies_alive);
+	}
+
 }
 
 void GameController::_round_complete() {
 	level +=1;
+	zombies_to_spawn = 5 + level * level;
+	zombies_alive = zombies_to_spawn;
+
 	if (gui != nullptr) {
 		gui->_set_round_label(level);
+		gui->_set_enemies_left_label(zombies_to_spawn);
 	}
 	if (zombieTower != nullptr) {
 		zombieTower->health = 100;
+		gui->_set_zombie_tower_health_bar(100);
 	}
 	if (playerTower != nullptr) {
 		playerTower->health = 100;
+		gui->_set_player_tower_health_bar(100);
 	}
 
-	timer = 10;
-	zombies_to_spawn = 5 + level * level;
+	if (level >= 5 && level < 10) {
+		timerValue = 2;
+	} else if (level >= 10) {
+		timerValue = 1;
+	}
+	timer = timerValue;
+	
+	
 }
 
 void GameController::_game_over() {
@@ -109,6 +132,7 @@ void GameController::_game_over() {
 	zombieTower = nullptr;
 	timer = 0;
 	zombies_to_spawn = 0;
+	zombies_alive = 0;
 	gui = nullptr;
 	get_tree()->change_scene("res://Menu.tscn");
 }

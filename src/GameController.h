@@ -29,6 +29,8 @@ namespace godot {
         int level = 1;
         float timer = 0;
         int zombies_to_spawn = 0;
+        int zombies_alive = 0;
+        float timerValue = 5;
         
 
         GameController();
@@ -49,6 +51,7 @@ namespace godot {
 
         void _tower_death_signal(Tower* tower);
         void _tower_health_signal(Tower* tower);
+        void _zombie_death_signal();
 
         private:
         bool _add_structure_in_gridblock(Structure::Type type, GridBlock::Direction direction, GridBlock* gridBlock);

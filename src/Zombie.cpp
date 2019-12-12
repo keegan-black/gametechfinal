@@ -61,6 +61,10 @@ void Zombie::_take_damage(float damage) {
             }
         }
 
+        if (gameController != nullptr) {
+            gameController->_zombie_death_signal();
+        }
+
         this->queue_free();
     }
 }
@@ -78,6 +82,8 @@ void Zombie::_ready(){
     ray = Object::cast_to<RayCast>(get_node("KinematicBody/RayCast"));
     player = Object::cast_to<Player>(get_node("/root/Spatial/Player"));
     gameController = Object::cast_to<GameController>(get_node("/root/GameController"));
+
+    attack_timer = 0.05;
 }
 
 void Zombie::_set_move_speed(float speed) {
@@ -131,6 +137,10 @@ void Zombie::handle_movement(Vector3& force) {
 
 void Zombie::_process(float delta) {
 
+    if (attack_timer != 0) {
+        attack_timer -= delta;
+    }
+
     if (player == nullptr) {
         goto tower_location;
     }
@@ -151,6 +161,12 @@ void Zombie::_process(float delta) {
         Godot::print("No location for zombie to go");
     }
     location_set:
+
+    if (attack_timer > 0) {
+        return;
+    } else {
+        attack_timer = 0.05;
+    }
 
     if (ray == nullptr) {
         Godot::print("Ray not found");
@@ -173,7 +189,7 @@ void Zombie::_process(float delta) {
         if (body != nullptr) {
             Structure* structure = Node::cast_to<Structure>(body->get_parent()->get_parent());
             if (structure != nullptr) {
-                structure->_take_damage(5);
+                structure->_take_damage(1);
             } else {
                 Tower* tower = Node::cast_to<Tower>(body->get_parent()->get_parent());
                 if (tower != nullptr) {

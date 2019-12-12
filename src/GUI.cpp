@@ -22,6 +22,7 @@ void GUI::_ready(){
 	round_label = cast_to<Label>(get_node("Round/VBoxContainer/RoundLabel"));
 	ammo_label = cast_to<Label>(get_node("PlayerItems/VBoxContainer/HBoxAmmo/AmmoLabel"));
 	materials_label = cast_to<Label>(get_node("PlayerItems/VBoxContainer/HBoxMaterials/MaterialsLabel"));
+	enemies_left_label = cast_to<Label>(get_node("Round/VBoxContainer/EnemiesLeftLabel"));
 	player_health_bar = cast_to<ProgressBar>(get_node("PlayerHealth/VBoxContainer/PlayerHealthBar"));
 	zombie_tower_health_bar = cast_to<ProgressBar>(get_node("TowerHealth/VBoxContainer/ZombieTowerHealthBar"));
 	player_tower_health_bar = cast_to<ProgressBar>(get_node("TowerHealth/VBoxContainer/PlayerTowerHealthBar"));
@@ -64,6 +65,12 @@ void GUI::_set_player_health_bar(float health) {
 void GUI::_set_round_label(int round) {
 	if (round_label != nullptr) {
 		round_label->set_text(std::to_string(round).c_str());
+	}
+}
+
+void GUI::_set_enemies_left_label(int enemies_left) {
+	if (enemies_left_label != nullptr) {
+		enemies_left_label->set_text(std::to_string(enemies_left).c_str());
 	}
 }
 

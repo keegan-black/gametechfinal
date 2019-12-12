@@ -278,7 +278,7 @@ margin_bottom = 21.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Round"]
 margin_right = 300.0
-margin_bottom = 70.0
+margin_bottom = 96.0
 
 [node name="Round" type="Label" parent="Round/VBoxContainer"]
 margin_right = 300.0
@@ -290,8 +290,23 @@ align = 1
 [node name="RoundLabel" type="Label" parent="Round/VBoxContainer"]
 margin_top = 25.0
 margin_right = 300.0
-margin_bottom = 70.0
+margin_bottom = 46.0
 custom_fonts/font = ExtResource( 2 )
-text = "0
-"
+text = "0"
+align = 1
+
+[node name="EnemiesLeft" type="Label" parent="Round/VBoxContainer"]
+margin_top = 50.0
+margin_right = 300.0
+margin_bottom = 71.0
+custom_fonts/font = ExtResource( 2 )
+text = "Enemies Left"
+align = 1
+
+[node name="EnemiesLeftLabel" type="Label" parent="Round/VBoxContainer"]
+margin_top = 75.0
+margin_right = 300.0
+margin_bottom = 96.0
+custom_fonts/font = ExtResource( 2 )
+text = "5"
 align = 1

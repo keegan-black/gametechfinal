@@ -26,6 +26,7 @@ namespace godot {
         float moveSpeed;
 
 		float health = 100;
+		float attack_timer = 0;
 
         Vector3 target;
 
