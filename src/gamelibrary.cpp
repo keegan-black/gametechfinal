@@ -7,6 +7,9 @@
 #include "Tower.h"
 #include "GUI.h"
 #include "Menu.h"
+#include "Health.h"
+#include "Ammo.h"
+#include "Materials.h"
 
 extern "C" void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *o) {
     godot::Godot::gdnative_init(o);
@@ -27,4 +30,7 @@ extern "C" void GDN_EXPORT godot_nativescript_init(void *handle) {
    godot::register_class<godot::Tower>();
    godot::register_class<godot::GUI>();
    godot::register_class<godot::Menu>();
+   godot::register_class<godot::Health>();
+   godot::register_class<godot::Ammo>();
+   godot::register_class<godot::Materials>();
 }

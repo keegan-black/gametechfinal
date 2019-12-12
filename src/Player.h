@@ -96,7 +96,13 @@ namespace godot {
 		void _input(InputEvent *event);
         void _move(FrontDirection front_direction, SideDirection side_direction, MovementAction action);
 		void _perform_action(Action action, BuildType buildType);
+		
 		void _take_damage(float damage);
+
+		void _pickup_health(float health);
+		void _pickup_ammo(int ammo);
+		void _pickup_materials(int materials);
+
 		void _ready();
 
 	private:

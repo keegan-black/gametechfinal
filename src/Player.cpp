@@ -60,6 +60,21 @@ void Player::_process(float delta) {
     _update_placeholder();
 }
 
+void Player::_pickup_health(float health) {
+    this->health += health;
+    _update_GUI();
+}
+
+void Player::_pickup_ammo(int ammo) {
+    this->ammo += ammo;
+    _update_GUI();
+}
+
+void Player::_pickup_materials(int materials) {
+    this->materials += materials;
+    _update_GUI();
+}
+
 void Player::_update_GUI() {
     GUI* gui = Node::cast_to<GUI>(get_node("/root/Spatial/GUI"));
     if (gui != nullptr) {

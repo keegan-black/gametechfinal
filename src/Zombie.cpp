@@ -1,6 +1,14 @@
 #include "Zombie.h"
 #include "Structure.h"
 #include "StaticBody.hpp"
+#include "Health.h"
+#include "Materials.h"
+#include "Ammo.h"
+
+#include <SceneTree.hpp>
+#include <ResourceLoader.hpp>
+#include <PackedScene.hpp>
+#include <Viewport.hpp>
 
 using namespace godot;
 #define GRID_SIZE 6
@@ -22,6 +30,37 @@ Zombie::~Zombie() {
 void Zombie::_take_damage(float damage) {
     health -= damage;
     if (health < 0) {
+        // Drop Table
+        ResourceLoader* resourceLoader = ResourceLoader::get_singleton();
+        Node* node = nullptr;
+        int dropItem = rand()%(1-10 + 1) + 1;
+        if (dropItem > 7) {
+            Ref<PackedScene> healthScene = resourceLoader->load("res://HealthItem.tscn");
+            node = healthScene->instance();
+            Health* health = Node::cast_to<Health>(node);
+            if (health != nullptr) {
+                get_node("/root/Spatial")->add_child(node);
+                health->set_global_transform(Transform(health->get_global_transform().get_basis(), me->get_global_transform().get_origin()));
+            }
+        } else if (dropItem > 5) {
+            Ref<PackedScene> ammoScene = resourceLoader->load("res://AmmoItem.tscn");
+            node = ammoScene->instance();
+            Ammo* ammo = Node::cast_to<Ammo>(node);
+            if (ammo != nullptr) {
+                get_node("/root/Spatial")->add_child(node);
+                ammo->set_global_transform(Transform(ammo->get_global_transform().get_basis(), me->get_global_transform().get_origin()));
+            }
+
+        } else  if (dropItem > 3) {
+            Ref<PackedScene> materialScene = resourceLoader->load("res://MaterialsItem.tscn");
+            node = materialScene->instance();
+            Materials* material = Node::cast_to<Materials>(node);
+            if (material != nullptr) {
+                get_node("/root/Spatial")->add_child(node);
+                material->set_global_transform(Transform(material->get_global_transform().get_basis(), me->get_global_transform().get_origin()));
+            }
+        }
+
         this->queue_free();
     }
 }

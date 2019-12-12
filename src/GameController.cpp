@@ -34,7 +34,7 @@ void GameController::_process(float delta) {
 	}
 
 	if (zombies_to_spawn > 0 && timer <= 0) {
-		timer = 10;
+		timer = 2;
 		zombies_to_spawn -= 1;
 		_spawn_zombie();
 	}
@@ -83,7 +83,7 @@ void GameController::_game_start() {
 	zombieTower = Node::cast_to<Tower>(get_node("/root/Spatial/ZombieTower"));
 	gui = Node::cast_to<GUI>(get_node("/root/Spatial/GUI"));
 
-	timer = 10;
+	timer = 2;
 	zombies_to_spawn = 5;
 }
 
