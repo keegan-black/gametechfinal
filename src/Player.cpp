@@ -608,9 +608,9 @@ void Player::handle_gravity(Vector3& force, Vector3& curr_gravity) {
 
 Vector3 Player::_to_grid_coordinate(Vector3 location) {
     Vector3 ret = Vector3(0,0,0);
-    ret.x = ((int) location.x / GRID_SIZE) * GRID_SIZE + (location.x/abs(location.x) * GRID_SIZE/2);
-    ret.y = ((int) location.y / GRID_SIZE) * GRID_SIZE + (location.y/abs(location.y) * GRID_SIZE/2);
-    ret.z = ((int) location.z / GRID_SIZE) * GRID_SIZE + (location.z/abs(location.z) * GRID_SIZE/2);
+    ret.x = (static_cast<int>(location.x) / 6) * 6 + (location.x/std::abs(location.x) * 3);
+    ret.y = (static_cast<int>(location.y) / 6) * 6 + (location.y/std::abs(location.y) * 3);
+    ret.z = (static_cast<int>(location.z) / 6) * 6 + (location.z/std::abs(location.z) * 3);
     return ret;
 }
 
